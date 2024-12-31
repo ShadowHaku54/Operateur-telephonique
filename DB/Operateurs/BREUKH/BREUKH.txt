@@ -1,0 +1,6 @@
+nom opérateur : 
+date creation :
+tarif ordinaire : 
+tarif different : 
+nombre de numéros vendues :
+nombre de numéros disponibles :
