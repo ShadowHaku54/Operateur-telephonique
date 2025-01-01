@@ -24,31 +24,53 @@ def generate_nums_for_index(index : str):
     return numeros
     
 
-def take_nom_operateur():
+def take_nom_operateur(exist_mode="none"):
+    
+    existence_check = {
+        "exist" : (lambda nom: OpModels.check_operate_exist(nom), "existe déjà"),
+        "not_exist" : (lambda nom: not OpModels.check_operate_exist(nom), "n'existe pas"),
+        "none" : (lambda nom: False, "")
+    }
+    
     message = "Saisir le nom de l'opérateur"
     
     nom_operateur = OpViews.take_value(message)
     
-    while check_op(nom_operateur):
+    no_respect = not check_op(nom_operateur)
+    existence = existence_check[exist_mode][0](nom_operateur)
+    existence_message = existence_check[exist_mode][1]
+    
+    while no_respect or existence:
+        
+        if existence:
+            adv = f"l'opérateur '{nom_operateur}' {existence_message}"
+        else:
+            adv = f"nombre de caractères compris entre [{MIN_CHAR_OP}-{MAX_CHAR_OP}]"
+        
         FuncViews.processing(type="error")
         nom_operateur = OpViews.take_value(
-            message, 
-            mode="error", 
-            advertissement=f"nombre de caractères compris entre [{MIN_CHAR_OP}-{MAX_CHAR_OP}]"
+            message,
+            mode="error",
+            advertissement = adv
         )
+        
+        no_respect = not check_op(nom_operateur)
+        existence = existence_check[exist_mode][0](nom_operateur)
+    
     FuncViews.processing()
+    
     return nom_operateur.capitalize()
 
 def check_op(nom_operateur):
     N = len(nom_operateur)
-    return N < MIN_CHAR_OP or N > MAX_CHAR_OP
+    return N >= MIN_CHAR_OP and N <= MAX_CHAR_OP
 
 def take_entier_positif(sms):
     entier = OpViews.take_value(sms)
     while not FuncControllers.est_un_entierPos(entier):
         FuncViews.processing(type="error")
         entier = OpViews.take_value(
-            sms, mode="error", advertissement="un entier positif SVP !"
+            sms, mode="error", advertissement = "un entier positif SVP !"
         )
     FuncViews.processing()
     return entier
@@ -56,12 +78,24 @@ def take_entier_positif(sms):
 def take_index(sms):        
     index = OpViews.take_value(sms)
     
-    while not check_index(index):
+    no_respect = not check_index(index)
+    existance = OpModels.check_index_exist(index) 
+
+    while no_respect or existance :
+        if (existance) :
+            adv = "Cet index existe déjà pour un opérateur"
+        else:
+            adv = f"entier compris entre [{MIN_INDEX}-{MAX_INDEX}]"
+            
         FuncViews.processing(type="error")
         index = OpViews.take_value(
-            sms, mode="error", advertissement=f"entier compris entre [{MIN_INDEX}-{MAX_INDEX}]"
+            sms, mode="error", advertissement = adv
         )
+        no_respect = not check_index(index)
+        existance = OpModels.check_index_exist(index)
+        
     FuncViews.processing()
+    
     return index
 
 def check_index(index):
@@ -70,7 +104,7 @@ def check_index(index):
 
 def create_new_op():
     operateur = {}
-    operateur["nom_operateur"] = take_nom_operateur()
+    operateur["nom_operateur"] = take_nom_operateur(exist_mode="exist")
     FuncViews.lines_spaces(2)
     operateur["tarif_ordinaire"] = take_entier_positif("Entrer le tarif ordinaire")
     FuncViews.lines_spaces(2)
@@ -79,18 +113,24 @@ def create_new_op():
     
     operateur["date_creation"] = FuncControllers.get_date()
     
-    first_index = {}
-    first_index["index"] = take_index("Entrer le premier index")
-    FuncViews.lines_spaces(2)
-    first_index["numeros"] = generate_nums_for_index(first_index["index"])
+    operateur["first_index"] = create_new_index("le premier ")
     
-    operateur["first_index"] = first_index
     return operateur
+
+def create_new_index(sms="l'"):
+    first_index = {}
+    first_index["index"] = take_index(f"Entrer {sms}index")
+    first_index["numeros"] = generate_nums_for_index(first_index["index"])
+    first_index["date_creation"] = FuncControllers.get_date()
+    return first_index
 
 def add_new_op():
     operateur = create_new_op()
-    while (OpModels.add_new_operateur(operateur) != 0):
-        FuncViews.error_message("L'opérateur existe déjà")
-        operateur = create_new_op()
+    OpModels.add_new_operateur(operateur)
     FuncViews.succes_message("Operateur créer avec succes")
-    print("OK")
+    
+
+def rename_operate():
+    ancien_nom = take_nom_operateur("not_exist")
+    nouveau_nom = take_nom_operateur("exist")
+    OpModels.rename_operate(ancien_nom, nouveau_nom, FuncControllers.get_date())

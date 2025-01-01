@@ -95,7 +95,7 @@ def effacer_ligne():
 # console.print(tree)
 
 def succes_message(message):
-    styliser_texte(message, "vert")
+    print(styliser_texte(message, "vert"))
 
 def error_message(message):
-    styliser_texte(message, "rouge")
+    print(styliser_texte(message, "rouge"))

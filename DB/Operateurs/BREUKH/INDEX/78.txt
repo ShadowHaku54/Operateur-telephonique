@@ -1,6 +1,0 @@
-index :
-numero vendus :
-numero disponibles :
-liste des numero :
-- 788234720 : 1
-

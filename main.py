@@ -4,6 +4,7 @@ from pprint import pprint
 import os
 
 os.system('cls')
-OpControllers.add_new_op()
+# OpControllers.add_new_op()
 # FuncViews.processing(type="error")
 
+OpControllers.rename_operate()
