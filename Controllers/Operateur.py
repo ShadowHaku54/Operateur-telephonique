@@ -25,20 +25,19 @@ def generate_nums_for_index(index : str):
     return numeros
 
 
-def take_nom_operateur(exist_mode=KEY_NONE):
+def take_any(sms, func_check_no_respect, func_check_exist=None, adv_exist_message="", exist_mode=KEY_NONE):
     
     existence_check = {
-        KEY_EXIST : lambda nom: OpModels.check_operate_exist(nom),
-        KEY_NOT_EXIST : lambda nom: not OpModels.check_operate_exist(nom),
+        KEY_EXIST : lambda nom: func_check_exist(nom),
+        KEY_NOT_EXIST : lambda nom: not func_check_exist(nom),
         KEY_NONE : lambda nom: False,
     }
     
-    message = "Saisir le nom de l'opérateur"
     
-    nom_operateur = OpViews.take_value(message)
+    valeur = OpViews.take_value(sms)
     
-    no_respect = not check_op(nom_operateur)
-    existence = existence_check[exist_mode](nom_operateur)
+    no_respect = not func_check_no_respect(valeur)
+    existence = existence_check[exist_mode](valeur)
     
     existence_message = FuncControllers.get_error_message(exist_mode)
     no_respect_message = FuncControllers.get_error_message(KEY_LENGTH_OP)
@@ -46,61 +45,33 @@ def take_nom_operateur(exist_mode=KEY_NONE):
     while no_respect or existence:
         FuncViews.processing(type="error")
         
-        adv = f"l'opérateur '{nom_operateur}' {existence_message}" if existence else no_respect_message
-        nom_operateur = OpViews.take_value(
-            message, mode="error", advertissement = adv
+        adv = adv_exist_message.format(valeur=valeur, existence_message=existence_message) if existence else no_respect_message
+        valeur = OpViews.take_value(
+            sms, mode="error", advertissement = adv
         )
         
-        no_respect = not check_op(nom_operateur)
-        existence = existence_check[exist_mode][0](nom_operateur)
+        no_respect = not func_check_no_respect(valeur)
+        existence = existence_check[exist_mode](valeur)
     
     FuncViews.processing()
     
-    return nom_operateur.capitalize()
+    return valeur
+
+def take_nom_operateur(exist_mode, sms="Saisir le nom de l'opérateur"):
+    adv_exist_message = "l'opérateur '{valeur}' {existence_message}"
+    return take_any(sms, check_op, OpModels.check_operate_exist, adv_exist_message, exist_mode).capitalize()
+
+def take_index(exist_mode, sms):
+    adv_message = "L'index '{valeur}' {existence_message} pour un opérateur"
+    return take_any(sms, check_index, OpModels.check_index_exist, adv_message, exist_mode)
+
+def take_entier_positif(sms):
+    return take_any(sms, FuncControllers.est_un_entierPos)
 
 def check_op(nom_operateur):
     N = len(nom_operateur)
     return N >= MIN_CHAR_OP and N <= MAX_CHAR_OP
 
-def take_entier_positif(sms):
-    entier = OpViews.take_value(sms)
-    no_respect = not FuncControllers.est_un_entierPos(entier)
-    no_respect_message = FuncControllers.get_error_message(KEY_INT_POS)
-    
-    while no_respect:
-        FuncViews.processing(type="error")
-        
-        entier = OpViews.take_value(
-            sms, mode="error", advertissement = no_respect_message
-        )
-        
-        no_respect = not FuncControllers.est_un_entierPos(entier)
-    FuncViews.processing()
-    return entier
-
-def take_index(sms):
-    index = OpViews.take_value(sms)
-    
-    no_respect = not check_index(index)
-    existence = OpModels.check_index_exist(index)
-    
-    existence_message = FuncControllers.get_error_message(KEY_EXIST)
-    no_respect_message = FuncControllers.get_error_message(KEY_LENGTH_INDEX)
-
-    while no_respect or existence :
-        FuncViews.processing(type="error")
-        
-        adv = f"L'index '{index}' {existence_message} pour un opérateur" if existence else no_respect_message
-        index = OpViews.take_value(
-            sms, mode="error", advertissement = adv
-        )
-        
-        no_respect = not check_index(index)
-        existence = OpModels.check_index_exist(index)
-        
-    FuncViews.processing()
-    
-    return index
 
 def check_index(index):
     return FuncControllers.est_un_entierPos(index) and  MIN_INDEX <= int(index) <= MAX_INDEX
@@ -123,7 +94,7 @@ def create_new_op():
 
 def create_new_index(sms="Entrer l'index"):
     first_index = {}
-    first_index["index"] = take_index(sms)
+    first_index["index"] = take_index(KEY_EXIST, sms)
     first_index["numeros"] = generate_nums_for_index(first_index["index"])
     first_index["date_creation"] = FuncControllers.get_date()
     return first_index
@@ -139,3 +110,4 @@ def rename_operate():
     nouveau_nom = take_nom_operateur(KEY_EXIST)
     OpModels.rename_operate(ancien_nom, nouveau_nom, FuncControllers.get_date())
     
+
