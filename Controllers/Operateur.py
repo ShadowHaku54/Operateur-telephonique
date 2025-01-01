@@ -25,7 +25,7 @@ def generate_nums_for_index(index : str):
     return numeros
 
 
-def take_any(sms, func_check_no_respect, func_check_exist=None, adv_exist_message="", exist_mode=KEY_NONE):
+def take_any(sms, func_check_no_respect, no_respect_key, func_check_exist=None, adv_exist_message="", exist_mode=KEY_NONE):
     
     existence_check = {
         KEY_EXIST : lambda nom: func_check_exist(nom),
@@ -40,7 +40,7 @@ def take_any(sms, func_check_no_respect, func_check_exist=None, adv_exist_messag
     existence = existence_check[exist_mode](valeur)
     
     existence_message = FuncControllers.get_error_message(exist_mode)
-    no_respect_message = FuncControllers.get_error_message(KEY_LENGTH_OP)
+    no_respect_message = FuncControllers.get_error_message(no_respect_key)
     
     while no_respect or existence:
         FuncViews.processing(type="error")
@@ -59,14 +59,14 @@ def take_any(sms, func_check_no_respect, func_check_exist=None, adv_exist_messag
 
 def take_nom_operateur(exist_mode, sms="Saisir le nom de l'opérateur"):
     adv_exist_message = "l'opérateur '{valeur}' {existence_message}"
-    return take_any(sms, check_op, OpModels.check_operate_exist, adv_exist_message, exist_mode).capitalize()
+    return take_any(sms, check_op, KEY_LENGTH_OP, OpModels.check_operate_exist, adv_exist_message, exist_mode).capitalize()
 
 def take_index(exist_mode, sms):
     adv_message = "L'index '{valeur}' {existence_message} pour un opérateur"
-    return take_any(sms, check_index, OpModels.check_index_exist, adv_message, exist_mode)
+    return take_any(sms, check_index, KEY_LENGTH_INDEX, OpModels.check_index_exist, adv_message, exist_mode)
 
 def take_entier_positif(sms):
-    return take_any(sms, FuncControllers.est_un_entierPos)
+    return take_any(sms, FuncControllers.est_un_entierPos, KEY_INT_POS)
 
 def check_op(nom_operateur):
     N = len(nom_operateur)
