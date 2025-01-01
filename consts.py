@@ -61,3 +61,25 @@ ANSI_STYLE = {
     "inversé": "7",
     "reset": "0"
 }
+
+
+# Clés dictionnaires
+KEY_EXIST = "exist"
+KEY_NOT_EXIST = "not_exist"
+KEY_LENGTH_OP = "lenght_op"
+KEY_LENGTH_INDEX = "lenght_index"
+KEY_NONE = "none"
+KEY_NOT_FOUND = "N/A"
+KEY_INT_POS = "int_positif"
+
+
+
+# DICTIONNAIRE
+ERROR_MESSAGES = {
+    KEY_EXIST : "existe déjà",
+    KEY_NOT_EXIST : "n'existe pas",
+    KEY_LENGTH_OP : f"nombre de caractères compris entre [{MIN_CHAR_OP}-{MAX_CHAR_OP}]",
+    KEY_LENGTH_INDEX : f"entier compris entre [{MIN_INDEX}-{MAX_INDEX}]",
+    KEY_INT_POS : "un entier positif SVP !",
+    KEY_NONE : ""
+}
