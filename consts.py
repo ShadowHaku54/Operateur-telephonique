@@ -1,4 +1,4 @@
-
+MAIN_TITLE = " opérateur téléphonique "
 PATH_DB_OPERATEUR = r"./DB/Operateurs/"
 DIR_INDEX = "Index"
 NUM_GENERES = 100
@@ -14,7 +14,11 @@ CHAR_INDEX = 2
 
 SPACES_TAB = 4
 TAB = " "*SPACES_TAB
+PROMPT_END_DEFAULT = f"\n>{TAB}"
+PROMPT_END_CHOICE = ": "
 
+STYLE_DEFAULT_INDEX = "magenta"
+# STYLE_DEFAULT_INPUT = "cyan"
 
 ANSI_COULEURS = {
     "noir": "30",
@@ -62,6 +66,8 @@ ANSI_STYLE = {
     "reset": "0"
 }
 
+COLOR_SECT_CLIENT = "yellow"
+COLOR_SECT_GESTION = "blue"
 
 # Clés dictionnaires
 KEY_EXIST = "exist"
@@ -83,3 +89,16 @@ ERROR_MESSAGES = {
     KEY_INT_POS : "un entier positif SVP !",
     KEY_NONE : ""
 }
+
+
+MENUS_GESTIONNAIRE = [
+    "Créer un opérateur",
+    "Renommer un opérateur",
+    "Lister les opérateurs et leur index",
+    "Lister les numéros d’un opérateur",
+    "Ajouter un nouvel index pour un opérateur existant",
+    "Supprimer un index d’un opérateur",
+    "Vendre un numéro",
+    "Vendre du crédit à un client",
+    "État de la caisse"
+]
