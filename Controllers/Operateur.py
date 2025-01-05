@@ -1,9 +1,9 @@
 import random
-from consts import NUM_GENERES, MAX_CHAR_OP, MIN_CHAR_OP, MIN_INDEX, MAX_INDEX
-from consts import KEY_EXIST, KEY_LENGTH_OP, KEY_NONE, KEY_NOT_EXIST, KEY_LENGTH_INDEX, KEY_INT_POS
+from consts import NUM_GENERES, MAX_CHAR_OP, MIN_CHAR_OP, MIN_INDEX, MAX_INDEX, BOOl_DISPONIPLE
+from consts import KEY_EXIST, KEY_LENGTH_OP, KEY_NONE, KEY_NOT_EXIST, KEY_LENGTH_INDEX, KEY_INT_POS, KEY_LENGTH_NUMB
 from consts import COLOR_SECT_GESTION, MENUS_GESTIONNAIRE, PROMPT_END_CHOICE
 from Controllers import Functions as FuncControllers
-from Views import Functions as FuncViews
+from Views import Functions as FuncViews, Operateur as OpViews
 from Models import Operateur as OpModels
 
 def generate_nums_for_index(index : str):
@@ -16,7 +16,7 @@ def generate_nums_for_index(index : str):
         lambda: f"{random.randint(10, 99)}{random.randint(0, 9)}{random.randint(10, 99)}{random.randint(0, 9)}{random.randint(0, 9)}"
     ]
     
-    while len(numeros) <= NUM_GENERES:
+    while len(numeros) < NUM_GENERES:
         motif = random.choice(motifs_possibles)()
         numero = index+motif
         numeros.add(numero)
@@ -47,7 +47,7 @@ def take_any(sms, func_check_no_respect, no_respect_key, func_check_exist=None, 
         
         adv = adv_exist_message.format(valeur=valeur, existence_message=existence_message) if existence else no_respect_message
         valeur = FuncViews.take_value(
-            sms, mode_affichage="error", 
+            sms, mode_affichage="error",
             advertissement = adv,
             already_error=already_error,
         )
@@ -80,6 +80,10 @@ def take_index(exist_mode, sms, nom_operateur=None):
     func_check_exist = lambda index : check_index_exist(index, nom_operateur)
     
     return take_any(sms, check_respect_index, KEY_LENGTH_INDEX, func_check_exist, adv_message, exist_mode)
+
+def take_numero(exist_mode, sms="Saisir le numéro"):
+    adv_message = "Le numéro '{valeur}' {existence_message}"
+    return take_any(sms, check_repect_numero, KEY_LENGTH_NUMB, check_numero_exist_et_non_vendu)
 
 def take_entier_positif(sms):
     return take_any(sms, FuncControllers.est_un_entierPos, KEY_INT_POS)
@@ -129,17 +133,74 @@ def rename_operate():
 
 def menu_gestionnaire_interactif():
     choices = FuncViews.afficher_menu("Menu principal : Gestion des Opérateurs", MENUS_GESTIONNAIRE)
-    choix = FuncViews.take_choice("Votre choix", default="1")
+    choix = FuncViews.take_choice(default="1")
     already_error = False
     while choix not in choices:
         FuncViews.processing(type="error")
-        choix = FuncViews.take_choice("Votre choix", mode_affichage="error", default="1", already_error=already_error)
+        choix = FuncViews.take_choice(mode_affichage="error", default="1", already_error=already_error)
         if not already_error:
             already_error = True
     FuncViews.processing()
     return int(choix)
 
-def use_case_getionnaire():
+def vendre_numero():
     FuncViews.effacer_ecran()
-    FuncViews.afficher_tritre_principal_styler()
-    FuncViews.afficher_titre_section_styler("Gestionnaire", COLOR_SECT_GESTION)
+    nom_operateur = choisir_operateur()
+    FuncViews.effacer_ecran()
+    index = choisir_index(nom_operateur)
+    FuncViews.effacer_ecran()
+    Liste_nums = OpModels.collect_index(nom_operateur, index)["liste_nums"]
+    OpViews.tableau_deroulant_inteactif(Liste_nums)
+
+def choisir_operateur():
+    liste_operateurs = OpModels.recuperer_liste_operateur()
+    if FuncControllers.if_list_contain_one_element(liste_operateurs):
+        op = liste_operateurs[0]
+        FuncViews.afficher_en_couleur(f"Le seul opérateur disponible est [{op}]", style="bold blue on black")
+        FuncViews.afficher_en_couleur("Vous serez diriger vers la liste de ses index", style="bright_green")
+        FuncViews.processing(6)
+        return op
+    
+    choices = FuncViews.afficher_menu("Liste des opérateurs disponible", liste_operateurs)
+    choix = FuncViews.take_choice(default="1")
+    already_error = False
+    while choix not in choices:
+        FuncViews.processing(type="error")
+        choix = FuncViews.take_choice(mode_affichage="error", default="1", already_error=already_error)
+        if not already_error:
+            already_error = True
+
+    FuncViews.processing()
+    return liste_operateurs[int(choix) - 1]
+
+def choisir_index(nom_operateur):
+    liste_index = OpModels.recupere_les_index_for_op(nom_operateur)
+    
+    if FuncControllers.if_list_contain_one_element(liste_index):
+        ind = liste_index[0]
+        FuncViews.afficher_en_couleur(f"Le seul index disponible est [{ind}]", style="bold blue on black")
+        FuncViews.afficher_en_couleur("Vous serez diriger vers la liste de ses index", style="bright_green")
+        FuncViews.processing(6)
+        return ind
+    
+    choices = FuncViews.afficher_menu(f"Liste des index disponibles pour [{nom_operateur}]", liste_index,)
+    choix = FuncViews.take_choice(default="1")
+    already_error = False
+    while choix not in choices:
+        FuncViews.processing(type="error")
+        choix = FuncViews.take_choice(mode_affichage="error", default="1", already_error=already_error)
+        if not already_error:
+            already_error = True
+    
+    FuncViews.processing()
+    return liste_index[int(choix) - 1]
+
+def check_numero_exist_et_non_vendu(numero_search, nom_operateur, index):
+    liste_nums = OpModels.collect_index(nom_operateur, index)["liste_nums"]
+    for numero, etat in liste_nums:
+        if numero == numero_search:
+            return etat == BOOl_DISPONIPLE
+    return False
+
+def check_repect_numero(numero : str):
+    return numero.isdigit() and len(numero) == 9

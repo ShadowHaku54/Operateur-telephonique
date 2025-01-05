@@ -9,7 +9,6 @@ from rich.rule import Rule
 from rich.text import Text
 from rich.table import Table
 from rich.panel import Panel
-from rich.prompt import Prompt
 console = Console()
 
 from consts import TAB, MAIN_TITLE, STYLE_DEFAULT_INDEX
@@ -35,7 +34,7 @@ def processing(duree=2, largeur_barre=50, type="succes"):
         sys.stdout.flush()
         time.sleep(duree / largeur_barre)
     effacer_ligne()
-    
+
 
 def remonter_ligne(nb_lignes):
     effacer_ligne()
@@ -67,15 +66,15 @@ def take_value(message, mode_affichage="simple", advertissement = "", already_er
     action = actions[mode_affichage]
     return action(message)
 
-def take_choice(message, mode_affichage="simple", already_error=False, default=None):
+def take_choice(message="Votre choix", mode_affichage="simple", already_error=False, default=None, choices=[]):
     def saisie_simple(message):
-        return ask_choice(message, default=default)
+        return ask_choice(message, default=default, choices=choices)
 
     def saisie_error(message):
         nblines_to_clear = 1 + already_error
         remonter_ligne(nblines_to_clear)
-        afficher_en_couleur("Veuillez entrer un numéros parmis les options valides ❗", style="red")
-        return ask_choice(message, default=default)
+        afficher_en_couleur("Veuillez entrer un choix parmi les options valides ❗", style="red")
+        return ask_choice(message, default=default, choices=choices)
 
     actions = {
         "simple": saisie_simple,
@@ -136,8 +135,11 @@ def afficher_menu(
 def afficher_en_couleur(message, style="green", end='\n'):
     console.print(f"[{style}]{message}[/{style}]", end=end)
 
-def ask_choice(message, style_sms="bold yellow", default=None):
+def ask_choice(message, style_sms="bold yellow", default=None, choices=[]):
     afficher_en_couleur(message, style_sms, end="")
+
+    if choices:
+        afficher_en_couleur(f" [{'/'.join(choices)}]", style="green", end="")
     if default is not None:
         afficher_en_couleur(f" ({default})", STYLE_DEFAULT_INDEX, end="")
     saisie = input(": ")
@@ -146,3 +148,4 @@ def ask_choice(message, style_sms="bold yellow", default=None):
 def lire(message, style_sms="bold"):
     afficher_en_couleur(message, style_sms, end="")
     return input(f"\n> {TAB}")
+

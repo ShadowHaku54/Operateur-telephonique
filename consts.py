@@ -2,8 +2,8 @@ MAIN_TITLE = " opérateur téléphonique "
 PATH_DB_OPERATEUR = r"./DB/Operateurs/"
 DIR_INDEX = "Index"
 NUM_GENERES = 100
-BOOl_DISPONIPLE = 1
-BOOL_INDISPONIBLE = 0
+BOOl_DISPONIPLE = "1"
+BOOL_INDISPONIBLE = "0"
 
 MAX_CHAR_OP = 15
 MIN_CHAR_OP = 3
@@ -17,54 +17,12 @@ TAB = " "*SPACES_TAB
 PROMPT_END_DEFAULT = f"\n>{TAB}"
 PROMPT_END_CHOICE = ": "
 
-STYLE_DEFAULT_INDEX = "magenta"
+STYLE_DEFAULT_INDEX = "bright_cyan"
 # STYLE_DEFAULT_INPUT = "cyan"
 
-ANSI_COULEURS = {
-    "noir": "30",
-    "rouge": "31",
-    "vert": "32",
-    "jaune": "33",
-    "bleu": "34",
-    "magenta": "35",
-    "cyan": "36",
-    "blanc": "37",
-    "gris_clair": "90",
-    "rouge_clair": "91",
-    "vert_clair": "92",
-    "jaune_clair": "93",
-    "bleu_clair": "94",
-    "magenta_clair": "95",
-    "cyan_clair": "96",
-    "blanc_clair": "97",
-    "reset": "0"
-}
 
-ANSI_FONDS = {
-    "noir": "40",
-    "rouge": "41",
-    "vert": "42",
-    "jaune": "43",
-    "bleu": "44",
-    "magenta": "45",
-    "cyan": "46",
-    "blanc": "47",
-    "gris_clair": "100",
-    "rouge_clair": "101",
-    "vert_clair": "102",
-    "jaune_clair": "103",
-    "bleu_clair": "104",
-    "magenta_clair": "105",
-    "cyan_clair": "106",
-    "blanc_clair": "107"
-}
-
-ANSI_STYLE = {
-    "gras": "1",
-    "souligné": "4",
-    "inversé": "7",
-    "reset": "0"
-}
+BG_COLOR_HEXA = "on #282C34"
+BG_COLOR_SYS = ""
 
 COLOR_SECT_CLIENT = "yellow"
 COLOR_SECT_GESTION = "blue"
@@ -77,6 +35,8 @@ KEY_LENGTH_INDEX = "lenght_index"
 KEY_NONE = "none"
 KEY_NOT_FOUND = "N/A"
 KEY_INT_POS = "int_positif"
+KEY_LENGTH_NUMB = "lenght_numero"
+KEY_NOT_EXIST_NUMB = "not_exist_for_num"
 
 
 
@@ -84,11 +44,14 @@ KEY_INT_POS = "int_positif"
 ERROR_MESSAGES = {
     KEY_EXIST : "existe déjà",
     KEY_NOT_EXIST : "n'existe pas",
-    KEY_LENGTH_OP : f"nombre de caractères compris entre [{MIN_CHAR_OP}-{MAX_CHAR_OP}]",
-    KEY_LENGTH_INDEX : f"entier compris entre [{MIN_INDEX}-{MAX_INDEX}]",
-    KEY_INT_POS : "un entier positif SVP !",
+    KEY_LENGTH_OP : f"nombre de caractères doit être compris entre [{MIN_CHAR_OP}-{MAX_CHAR_OP}]",
+    KEY_LENGTH_INDEX : f"Veuillez entrer un entier compris entre [{MIN_INDEX}-{MAX_INDEX}]",
+    KEY_INT_POS : "Veuillez saisir un entier positif",
+    KEY_LENGTH_NUMB : "Veuillez saisir un numéro valide",
+    KEY_NOT_EXIST_NUMB : "n'est pas disponible",
     KEY_NONE : ""
 }
+
 
 
 MENUS_GESTIONNAIRE = [
@@ -102,3 +65,19 @@ MENUS_GESTIONNAIRE = [
     "Vendre du crédit à un client",
     "État de la caisse"
 ]
+KEY_TITLE = "tilte"
+KEY_OPTIONS = "options"
+KEY_TITLE_STYLE = ""
+KEY_ALTERN_COLORS = ""
+KEY_BORDER_PANEL_STYLE = ""
+KEY_INDEX_EXIST = ""
+
+
+STRUCT_MENU_GESTIONNAIRE = {
+    KEY_TITLE : " opérateur téléphonique ",
+    KEY_OPTIONS : MENUS_GESTIONNAIRE,
+    KEY_TITLE_STYLE : "bold white",
+    KEY_ALTERN_COLORS : ("bright_yellow", "bright_green"),
+    KEY_BORDER_PANEL_STYLE : "bright_blue",
+    KEY_INDEX_EXIST : STYLE_DEFAULT_INDEX,
+}

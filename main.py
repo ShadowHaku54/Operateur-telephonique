@@ -1,7 +1,13 @@
 from Controllers import Operateur as OpControllers
+# from Controllers import Functions as FuncControllers
+from consts import BG_COLOR_SYS
 
 # OpControllers.add_new_op()
-OpControllers.menu_gestionnaire_interactif()
+# OpControllers.menu_gestionnaire_interactif()
+from os import system
+system(f"color {BG_COLOR_SYS}")
+OpControllers.vendre_numero()
+# print(FuncControllers.confirmer("Voulez vous continuer?", sensitve_case=True))
 # OpControllers.use_case_getionnaire()
 
 # OpControllers.rename_operate()
