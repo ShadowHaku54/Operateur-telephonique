@@ -1,40 +1,69 @@
 # Functions - Views
 import time
 import sys
-from os import system as osSystem
-from tqdm import tqdm
+# from os import system as osSystem
+import pyfiglet
+from shutil import get_terminal_size
 
 from rich.console import Console
 from rich.rule import Rule
 from rich.text import Text
 from rich.table import Table
 from rich.panel import Panel
+from rich.prompt import Prompt
 console = Console()
 
-from consts import TAB, MAIN_TITLE, STYLE_DEFAULT_INDEX
+from consts import TAB, MAIN_TITLE, STYLE_DEFAULT_INDEX, DEFAULT_LINES_SPACES, PROCESSING_COUPURE, BG_COLOR_HEXA
 
 
 def effacer_ecran():
-    osSystem("cls")
+    print("\033c", end="")
+    # osSystem("cls")
 
 
-def lines_spaces(nb_lignes):
+def lines_spaces(nb_lignes=DEFAULT_LINES_SPACES):
     for _ in range(nb_lignes):
         print("")
 
+def max_col_rows_terminal(terminal_size=get_terminal_size(), col_width=1, limite_marge_col=0, limite_marge_row=0):
+    terminal_width = terminal_size.columns
+    terminal_height = terminal_size.lines
 
-def processing(duree=2, largeur_barre=50, type="succes"):
-    for i in range(largeur_barre + 1):
+    available_columns = max(1, (terminal_width - limite_marge_col) // col_width)
+    rows_per_page = max(1, terminal_height - limite_marge_row)
+
+    return available_columns, rows_per_page
+
+
+def processing(duree=1, remplissage=0.3, mode="succes", go="go"):
+    largeur_barre = int(remplissage * max_col_rows_terminal()[0])
+    message, coupure, range_go = processing_sous_func(mode, go, largeur_barre)
+    for i in range_go:
         pourcentage = int((i / largeur_barre) * 100)
         barre = "#" * i + " " * (largeur_barre - i)
-        message = "\033[31mError traitement\033[0m🛑" if (type == "error") else "\033[32mSucces traitement\033[0m🟢"
-        if type == "error" and i%10 == 0:
-            time.sleep(0.5)
+        if i%5 == 0:
+            time.sleep(coupure)
         sys.stdout.write(f"\rProcessing [{barre}] {pourcentage}/100 {message}")
         sys.stdout.flush()
         time.sleep(duree / largeur_barre)
     effacer_ligne()
 
+def processing_sous_func(mode, go, largeur_barre):
+    message = coupure = range_go = None
+    
+    if mode == "error":
+        message = "\033[31mError traitement\033[0m🛑"
+        coupure = PROCESSING_COUPURE
+    elif mode == "succes":
+        message = "\033[32mSucces traitement\033[0m🟢"
+        coupure = 0
+
+    if go=="go":
+        range_go = range(0, largeur_barre+1)  
+    elif go=="back":
+        range_go = range(largeur_barre+1, 0, -1)
+
+    return message, coupure, range_go
 
 def remonter_ligne(nb_lignes):
     effacer_ligne()
@@ -47,13 +76,15 @@ def effacer_ligne():
     sys.stdout.write("\r")
     sys.stdout.flush()
 
+def continuer(sms="Appuyer pour retourner"):
+    console.input(f"[blue on black]{sms}...[/]")
 
 def take_value(message, mode_affichage="simple", advertissement = "", already_error=False):
     def saisie_simple(message):
         return lire(message)
 
     def saisie_error(message):
-        nblines_to_clear = 2 + already_error
+        nblines_to_clear = 2 + DEFAULT_LINES_SPACES + already_error
         remonter_ligne(nblines_to_clear)
         error_message(advertissement)
         return lire(message)
@@ -66,15 +97,33 @@ def take_value(message, mode_affichage="simple", advertissement = "", already_er
     action = actions[mode_affichage]
     return action(message)
 
-def take_choice(message="Votre choix", mode_affichage="simple", already_error=False, default=None, choices=[]):
+def take_choice(message="Votre choix", mode_affichage="simple", already_error=False, default=None, choices=None):
     def saisie_simple(message):
         return ask_choice(message, default=default, choices=choices)
 
     def saisie_error(message):
-        nblines_to_clear = 1 + already_error
+        nblines_to_clear = 1 + DEFAULT_LINES_SPACES + already_error
         remonter_ligne(nblines_to_clear)
-        afficher_en_couleur("Veuillez entrer un choix parmi les options valides ❗", style="red")
+        error_message_simple("Veuillez entrer un choix parmi les options disponibles ❗")
         return ask_choice(message, default=default, choices=choices)
+
+    actions = {
+        "simple": saisie_simple,
+        "error": saisie_error,
+    }
+
+    action = actions[mode_affichage]
+    return action(message)
+
+def take_password(message="Entrez le mot de passe", mode_affichage="simple", already_error=False, default=None, adv_sms=""):
+    def saisie_simple(message):
+        return ask_password(message, default=default)
+
+    def saisie_error(message):
+        nblines_to_clear = 1 + DEFAULT_LINES_SPACES + already_error
+        remonter_ligne(nblines_to_clear)
+        error_message_simple(adv_sms)
+        return ask_password(message, default=default)
 
     actions = {
         "simple": saisie_simple,
@@ -86,66 +135,128 @@ def take_choice(message="Votre choix", mode_affichage="simple", already_error=Fa
 
 
 def succes_message(message):
-    afficher_en_couleur(message, style="green")
+    afficher_en_couleur(message, style="bold bright_white on bright_green")
 
 def error_message(message):
     afficher_en_couleur(">>> ERROR <<<", style="bold red on black", end="")
     afficher_en_couleur(f" {message.upper()} ", style="yellow on black", end="")
     afficher_en_couleur(">>> ERROR <<<", style="bold red on black")
 
+def warning_message(message):
+    afficher_en_couleur(message, style="bold #fe7b00 on black")
+
+def error_message_simple(message):
+    afficher_en_couleur(message, style="red on black")
 
 def afficher_tritre_principal_styler():
+    effacer_ecran()
     titre_principal = Text(MAIN_TITLE.upper(), style="bold on red")
     console.print(Rule(titre_principal, style="cyan on black", characters="═"))
 
 def afficher_titre_section_styler(name_section, color):
-    sous_titre = Text(f"Section {name_section} ", style=f"bold on {color}")
+    sous_titre = Text(f"Section {name_section} ", style=f"bold #ffffff on {color}")
     console.print(Rule(sous_titre, style=f"{color} on black", characters=">", align="left"))
 
+def afficher_titre_operation_styler(name_operation):
+    titre_operation = Text(name_operation.upper(), style="bold magenta on bright_white")
+    console.print(Rule(titre_operation, style="magenta on black", align="right"))
 
 def afficher_menu(
-    title, options, title_style="bold white",
+    title, options, title_style=f"bold white",
     altern_colors=("bright_yellow", "bright_green"),
-    border_panel_style="bright_blue", index_style=STYLE_DEFAULT_INDEX
+    border_panel_style="bright_blue", index_style="bright_cyan"
 ):
 
     table = Table(show_header=False, show_edge=False, padding=(0, 4))
 
-    choices_str = set()
     len_altcol = len(altern_colors)
     
     for index, option in enumerate(options, start=1):
         color = altern_colors[index % len_altcol]
-        
         table.add_row(f"[{index_style}][{index}][/{index_style}]", f"[{color}]{option}[/{color}]")
         
-        choices_str.add(str(index))
 
     panel = Panel(
         table,
         title=f"[{title_style}]{title}[/{title_style}]",
         border_style=border_panel_style,
         padding=(1, 2),
+        style=BG_COLOR_HEXA,
     )
 
     console.print(panel, justify="center")
+    lines_spaces()
 
-    return choices_str
 
 def afficher_en_couleur(message, style="green", end='\n'):
     console.print(f"[{style}]{message}[/{style}]", end=end)
 
-def ask_choice(message, style_sms="bold yellow", default=None, choices=[]):
+def ask_choice(message, style_sms="bold yellow", default=None, choices=None):
     afficher_en_couleur(message, style_sms, end="")
-
-    if choices:
+    if choices is not None:
         afficher_en_couleur(f" [{'/'.join(choices)}]", style="green", end="")
     if default is not None:
         afficher_en_couleur(f" ({default})", STYLE_DEFAULT_INDEX, end="")
-    saisie = input(": ")
-    return default if saisie=="" else saisie
+    saisie = input(": ").strip()
+    lines_spaces()
+    return default if default and saisie=="" else saisie
 
-def lire(message, style_sms="bold"):
-    afficher_en_couleur(message, style_sms, end="")
-    return input(f"\n> {TAB}")
+def lire(message, style_sms="bold bright_magenta"):
+    afficher_en_couleur(f"{message}\n> {TAB}", style_sms, end="")
+    user_input = input().strip()
+    lines_spaces()
+    return user_input
 
+
+def formated_num(numero):
+    return f"{numero[:2]} {numero[2:5]} {numero[5:7]} {numero[7:]}"
+
+def ask_password(sms, default=None):
+    message_style = Text(sms, "bold bright_yellow")
+    mdp = Prompt.ask(
+        message_style,
+        password=True,
+        default=default,
+    )
+    lines_spaces()
+    return mdp
+
+def take_login_and_password(sms1="Entrer le login/numéro", sms2="Entrer le mot de passe/code pin ", mode_affichage="simple", already_error=False, adv="login ou mot de passe incorrect"):
+    def saisie_simple(sms1, sms2):
+        value = take_value(sms1)
+        password = take_password(sms2)
+        return value, password
+
+    def saisie_error(sms1, sms2):
+        nblines_to_clear = 3 + DEFAULT_LINES_SPACES*2 + already_error
+        remonter_ligne(nblines_to_clear)
+        error_message(adv)
+        return saisie_simple(sms1, sms2)
+
+    actions = {
+        "simple": saisie_simple,
+        "error": saisie_error,
+    }
+
+    action = actions[mode_affichage]
+    return action(sms1, sms2)
+
+def take_numero(sms1="Entrer le nom d'opérateur", sms2="Entrer le numéro", mode_affichage="simple", already_error=False, adv="Numéro non acrédité"):
+    def saisie_simple(sms1, sms2):
+        value = take_value(sms1)
+        password = take_password(sms2)
+        return value, password
+
+    def saisie_error(sms1, sms2):
+        nblines_to_clear = 3 + DEFAULT_LINES_SPACES*2 + already_error
+        remonter_ligne(nblines_to_clear)
+        error_message(adv)
+        return saisie_simple(sms1, sms2)
+
+    actions = {
+        "simple": saisie_simple,
+        "error": saisie_error,
+    }
+
+    action = actions[mode_affichage]
+    return action(sms1, sms2)

@@ -1,0 +1,5 @@
+creation | 10/01/2025 15:19:25 | création de l'opérateur 'Orange'
+ajout_index | 10/01/2025 15:19:25 | Ajout d'un nouvel index '78' avec 100 numéros
+ajout_index | 10/01/2025 15:23:16 | Ajout d'un nouvel index '79' avec 100 numéros
+sell_num | 10/01/2025 15:53:46 | numéro 781023278 vendu au client 'test'
+sell_credit | 10/01/2025 15:58:22 | 7 | Le client '781023278' a pris 7 crédits

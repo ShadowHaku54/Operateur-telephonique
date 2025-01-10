@@ -1,0 +1,6 @@
+creation | 10/01/2025 15:22:49 | création de l'opérateur 'Breukh'
+ajout_index | 10/01/2025 15:22:49 | Ajout d'un nouvel index '75' avec 100 numéros
+del_index | 10/01/2025 15:23:36 | L'index '75' supprimé
+ajout_index | 10/01/2025 15:38:50 | Ajout d'un nouvel index '75' avec 100 numéros
+del_index | 10/01/2025 15:39:21 | L'index '75' supprimé
+rename_op | 10/01/2025 15:47:15 | opérateur 'Breukh' renommé en 'Wave'

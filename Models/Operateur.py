@@ -1,28 +1,42 @@
 # Operateur - Models
 import os
-from consts import PATH_DB_OPERATEUR, NUM_GENERES, BOOl_DISPONIPLE, DIR_INDEX, CHAR_INDEX
+from consts import (
+    PATH_DB_OPERATEURS, FILE_INFO, BOOL_DISPO, DIR_INDEX, CHAR_INDEX, PATH_DB_CLIENTS,
+    FILE_GESTIONNAIRES, FILE_REGISTRE
+)
 
 def add_new_operateur(operateur):
-    path_file = os.path.join(PATH_DB_OPERATEUR, operateur["nom_operateur"])
+    path_file = os.path.join(PATH_DB_OPERATEURS, operateur["nom_operateur"])
     
     os.makedirs(path_file)
     
-    file_info = f"{os.path.join(path_file, operateur["nom_operateur"])}.txt"
+    file_info = os.path.join(path_file, FILE_INFO)
     
     with open(file_info, "w", encoding='utf-8') as f:
         f.write(f"nom opérateur : {operateur["nom_operateur"]}\n")
         f.write(f"date de création : {operateur["date_creation"]}\n")
-        f.write(f"date de modification : {operateur["date_creation"]}\n")
         f.write(f"tarif ordinaire : {operateur["tarif_ordinaire"]}\n")
         f.write(f"tarif différent : {operateur["tarif_different"]}\n")
+    
+    file_registre = os.path.join(path_file, FILE_REGISTRE)
+    with open(file_registre, "w", encoding='utf-8') as f:
+        f.write(f"creation | {operateur["date_creation"]} | création de l'opérateur '{operateur["nom_operateur"]}'\n")
 
     path_index = os.path.join(path_file, DIR_INDEX)
     os.makedirs(path_index)
-    add_new_index(operateur["first_index"], operateur["nom_operateur"])
+
+
+def update_registre(nom_operateur, type_update, date, commentaire, value=""):
+    file_registre = os.path.join(PATH_DB_OPERATEURS, nom_operateur, FILE_REGISTRE)
+    with open(file_registre, "a", encoding='utf-8') as f:
+        if value:
+            f.write(f"{type_update} | {date} | {value} | {commentaire}\n")
+        else:
+            f.write(f"{type_update} | {date} | {commentaire}\n")
 
 
 def recupere_les_index_for_all():
-    liste_operateur = os.listdir(PATH_DB_OPERATEUR)
+    liste_operateur = os.listdir(PATH_DB_OPERATEURS)
     liste_index = []
     
     for nom_operateur in liste_operateur:
@@ -31,26 +45,29 @@ def recupere_les_index_for_all():
     return liste_index
 
 def recupere_les_index_for_op(nom_operateur):
-    path_index = os.path.join(PATH_DB_OPERATEUR, nom_operateur, DIR_INDEX)
+    path_index = os.path.join(PATH_DB_OPERATEURS, nom_operateur, DIR_INDEX)
     
     les_index_txt = os.listdir(path_index)
     
     return [index[:CHAR_INDEX] for index in les_index_txt]
 
 
-
-def add_new_index(index , nom_operateur):
-    file_index = f"{os.path.join(PATH_DB_OPERATEUR, nom_operateur, DIR_INDEX, index["index"])}.txt"
-    
+def add_new_index(index, nom_operateur):
+    path_dir = os.path.join(PATH_DB_OPERATEURS, nom_operateur)
+    file_index = os.path.join(path_dir, DIR_INDEX, f"{index["index"]}.txt")
     with open(file_index, "w", encoding='utf-8') as f:
-        f.write(f"index : {index["index"]}\n")
-        f.write(f"date de création : {index["date_creation"]}\n")
-        f.write("numéro vendus : 0\n")
-        f.write(f"numéro disponibles : {NUM_GENERES}\n")
-        f.write("liste des numéros : \n")
-        
-        for numero in index["numeros"]:
-            f.write(f"- {numero} : {BOOl_DISPONIPLE}\n")
+        for numero in index["liste_nums"]:
+            f.write(f"{numero} : {BOOL_DISPO}\n")
+
+def maj_index(index, nom_operateur):
+    file_index = os.path.join(PATH_DB_OPERATEURS, nom_operateur, DIR_INDEX, f"{index["index"]}.txt")
+    with open(file_index, "w", encoding='utf-8') as f:
+        for numero, etat in index["liste_nums"]:
+            f.write(f"{numero} : {etat}\n")
+
+def del_index(nom_operateur, index):
+    file_index = os.path.join(PATH_DB_OPERATEURS, nom_operateur, DIR_INDEX, f"{index}.txt")
+    os.remove(file_index)
 
 def readlines_file(path_file):
     with open(path_file, 'r', encoding="utf-8") as f:
@@ -62,17 +79,16 @@ def write_file(path_file, lignes):
         for ligne in lignes:
             f.write(ligne)
 
-def rename_operate(ancien_nom, nouveau_nom, date_modification):
-    path_dir = rename_path(PATH_DB_OPERATEUR, ancien_nom, nouveau_nom)
+def rename_operate(ancien_nom, nouveau_nom):
+    path_dir = rename_path(PATH_DB_OPERATEURS, ancien_nom, nouveau_nom)
     
-    path_file = rename_path(path_dir, f"{ancien_nom}.txt", f"{nouveau_nom}.txt")
+    file_info = os.path.join(path_dir, FILE_INFO)
     
-    lines_op = readlines_file(path_file)
+    lines_op = readlines_file(file_info)
     
     lines_op[0] = f"nom opérateur : {nouveau_nom}\n"
-    lines_op[2] = f"date de modification : {date_modification}\n"
     
-    write_file(path_file, lines_op)
+    write_file(file_info, lines_op)
 
 def rename_path(start_path, last_end_path, new_end_path):
     path_ancien = os.path.join(start_path, last_end_path)
@@ -84,31 +100,69 @@ def rename_path(start_path, last_end_path, new_end_path):
     return path_nouveau
 
 
-def collect_index(nom_operateur, index):
-    path_index = os.path.join(PATH_DB_OPERATEUR, nom_operateur, DIR_INDEX, f"{index}.txt")
-    index_struct = {}
+def collect_nums_index(nom_operateur, index):
+    path_index = os.path.join(PATH_DB_OPERATEURS, nom_operateur, DIR_INDEX, f"{index}.txt")
     liste_nums = []
     with open(path_index, "r", encoding="utf-8") as f:
         for ligne in f:
-            if ligne.startswith("- "):
-                numero, etat = ligne[2:].split(':')
-                liste_nums.append([numero.strip(), etat.strip()])
-            elif ligne.startswith("index : "):
-                index_struct["index"] = last_part_str(ligne)
-            elif ligne.startswith("date de création : "):
-                index_struct["date_creation"] = last_part_str(ligne)
-            elif ligne.startswith("numéro vendus : "):
-                index_struct["num_sell"] = last_part_str(ligne)
-            elif ligne.startswith("numéro disponibles : "):
-                index_struct["num_dispo"] = last_part_str(ligne)
-        index_struct["liste_nums"] = liste_nums
-    return index_struct
+            numero, etat = ligne.split(' : ')
+            liste_nums.append([numero.strip(), etat.strip()])
+    return liste_nums
 
-def last_part_str(chaine, sep=":"):
-    return chaine.split(sep, 1)[1].strip()
 
 def recuperer_liste_operateur():
-    return os.listdir(PATH_DB_OPERATEUR)
+    return os.listdir(PATH_DB_OPERATEURS)
 
+def save_new_client(new_client):
+    path_file = os.path.join(PATH_DB_CLIENTS, f"{new_client["numero"]}.txt")
+    with open(path_file, 'w', encoding="utf-8") as f:
+        f.write(f"nom : {new_client["nom"]}\n")
+        f.write(f"numéro : {new_client["numero"]}\n")
+        f.write(f"opérateur : {new_client["nom_operateur"]}\n")
+        f.write(f"code pin : {new_client["code_pin"]}\n")
+        f.write("crédit : 0\n")
+        f.write("Liste des contacts :\n")
+        f.write("liste des appels :\n")
 
+def recupere_gestionnaires():
+    path_file = FILE_GESTIONNAIRES
+    with open(path_file, 'r', encoding="utf-8")as f:
+        contenu = f.read()
+    return contenu.splitlines()
 
+def ajouter_credit_client(numero, credit):
+    path_file = os.path.join(PATH_DB_CLIENTS, f"{numero}.txt")
+    with open(path_file, 'r', encoding="utf-8")as f:
+        lines = f.readlines()
+    N = len(lines)
+    for i in range(N):
+        if lines[i].startswith("crédit :"):
+            ancien_credit = int(lines[i].split(':')[1])
+            nouveau_credit = ancien_credit + credit
+            lines[i] = f"crédit : {nouveau_credit}\n"
+            break
+    
+    with open(path_file, 'w', encoding="utf-8") as f:
+        for i in range(N):
+            f.write(lines[i])
+
+def donnees_caisse(nom_operateur):
+    path_file = os.path.join(PATH_DB_OPERATEURS, nom_operateur, FILE_REGISTRE)
+    caisse = {}
+    with open(path_file, 'r', encoding="utf-8") as f:
+        for line in f:
+            if line.startswith('sell_credit'):
+                date, value = line.split(' | ')[1:3]
+                date_jma = date.split(' ')[0]
+                if date_jma not in caisse:
+                    caisse[date_jma] = {'sell_credit': int(value), 'sell_num': 0}
+                else:
+                    caisse[date_jma]["sell_credit"]+=int(value)
+            elif line.startswith('sell_num'):
+                date = line.split(' | ')[1]
+                date_jma = date.split(' ')[0]
+                if date_jma not in caisse:
+                    caisse[date_jma] = {'sell_credit': 0, 'sell_num': 1}
+                else:
+                    caisse[date_jma]["sell_num"]+=1
+    return caisse

@@ -1,0 +1,7 @@
+nom : test
+numéro : 781023278
+opérateur : Orange
+code pin : 1234
+crédit : 7
+Liste des contacts :
+liste des appels :
