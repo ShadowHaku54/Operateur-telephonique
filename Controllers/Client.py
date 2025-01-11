@@ -4,8 +4,7 @@ from Views import Functions as FuncViews
 from Views import Client as ClientViews
 from Controllers import Functions as FuncControllers
 from consts import (
-    USER_CLIENT, COLOR_SECT_CLIENT, MENU_CLIENT, LEN_MENU_CLIENT,
-    KEY_LENGTH_NUMB, TAUX_TRANSFERT
+    USER_CLIENT, COLOR_SECT_CLIENT, MENU_CLIENT, LEN_MENU_CLIENT, TAUX_TRANSFERT
 )
 
 Client = {
@@ -84,11 +83,13 @@ def check_code_pin(code_pin):
 def afficher_repertoire():
     pass
 
+def ajouter_contact():
+    pass
 
 def transfert_credit(choix):
     header_client(choix)
     
-    numero = take_numero()
+    numero = FuncControllers.take_numero()
     debt_credit = FuncControllers.take_credit()
     if check_numero(numero):
         credit_client = ClientModels.recuperer_credit(Client["numero"])
@@ -101,6 +102,19 @@ def transfert_credit(choix):
                 ClientModels.update_credit_client(numero, credit_avec_taux)
                 FuncViews.succes_message(f"{debt_credit} crédits envoyé au {numero}")
                 FuncViews.succes_message(f"Nouveau solde {new_solde_client}")
+                date = FuncControllers.get_date()
+                ClientModels.update_registre(
+                    Client['numero'],
+                    "transfert_credit",
+                    date,
+                    f"{debt_credit} crédits transférés au {numero}"
+                )
+                ClientModels.update_registre(
+                    numero,
+                    "receive_credit",
+                    date,
+                    f"{debt_credit} crédits reçu du {Client['numero']}"
+                )
         else:
             FuncViews.error_message("Solde insuffisant")
             FuncViews.error_message_simple("Veuillez d'abord recharger chez un fournisseur.")
@@ -109,19 +123,6 @@ def transfert_credit(choix):
         FuncViews.error_message_simple("Ce numéro est soit d'un opérateur différent, soit est le votre ou soit n'a pas encore été attribué")
     FuncViews.continuer()
 
-def take_numero(sms = "Entrer le numéro du client"):
-    numero = FuncViews.take_value(sms)
-    numero = FuncViews.reforme_num(numero)
-    already_error = False
-    while not FuncControllers.check_repect_numero(numero):
-        FuncViews.processing(mode="error")
-        numero = FuncViews.take_value(sms, "error", "Numéro incorrect", already_error)
-        numero = FuncViews.reforme_num(numero)
-        
-        if not already_error:
-            already_error = True
-    FuncViews.processing()
-    return numero
 
 def check_numero(numero):
     return Client["numero"] != numero and Client["operateur"] == FuncControllers.operateur_of_numero_client(numero)

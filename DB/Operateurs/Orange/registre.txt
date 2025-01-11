@@ -1,12 +1,8 @@
-creation | 10/01/2025 15:19:25 | création de l'opérateur 'Orange'
-ajout_index | 10/01/2025 15:19:25 | Ajout d'un nouvel index '78' avec 100 numéros
-ajout_index | 10/01/2025 15:23:16 | Ajout d'un nouvel index '79' avec 100 numéros
-sell_num | 10/01/2025 15:53:46 | numéro 781023278 vendu au client 'test'
-sell_credit | 10/01/2025 15:58:22 | 7 | Le client '781023278' a pris 7 crédits
-sell_num | 10/01/2025 18:38:50 | numéro 781093077 vendu au client 'test'
-sell_credit | 10/01/2025 18:41:33 | 112 | Le client '781093077' a pris 112 crédits
-sell_num | 10/01/2025 19:28:06 | numéro 794675490 vendu au client 'salim'
-sell_credit | 10/01/2025 19:34:26 | 100 | Le client '781093077' a pris 100 crédits
-sell_credit | 10/01/2025 19:44:35 | 165 | Le client '781093077' a pris 165 crédits
-sell_num | 10/01/2025 19:47:39 | numéro 789999828 vendu au client 'user'
-sell_credit | 11/01/2025 01:49:33 | 500 | Le client '794675490' a pris 500 crédits
+creation | 11/01/2025 03:18:31 | création de l'opérateur 'Orange'
+ajout_index | 11/01/2025 03:18:31 | Ajout d'un nouvel index '78' avec 100 numéros
+ajout_index | 11/01/2025 03:21:15 | Ajout d'un nouvel index '76' avec 100 numéros
+ajout_index | 11/01/2025 03:30:09 | Ajout d'un nouvel index '70' avec 100 numéros
+sell_num | 11/01/2025 03:52:34 | numéro 701735306 vendu au client 'test'
+sell_num | 11/01/2025 03:54:34 | numéro 763581726 vendu au client 'test'
+sell_credit | 11/01/2025 03:57:07 | 150 | Le client '701735306' a pris 150 crédits
+sell_credit | 11/01/2025 04:04:09 | 1000 | Le client '763581726' a pris 1000 crédits

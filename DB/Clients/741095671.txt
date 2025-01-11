@@ -1,7 +1,0 @@
-username : salim
-numéro : 741095671
-opérateur : Salim
-code pin : 1234
-crédit : 500
-Liste des contacts :
-liste des appels :

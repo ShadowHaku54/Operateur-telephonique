@@ -1,6 +1,5 @@
-creation | 10/01/2025 15:22:49 | création de l'opérateur 'Breukh'
-ajout_index | 10/01/2025 15:22:49 | Ajout d'un nouvel index '75' avec 100 numéros
-del_index | 10/01/2025 15:23:36 | L'index '75' supprimé
-ajout_index | 10/01/2025 15:38:50 | Ajout d'un nouvel index '75' avec 100 numéros
-del_index | 10/01/2025 15:39:21 | L'index '75' supprimé
-rename_op | 10/01/2025 15:47:15 | opérateur 'Breukh' renommé en 'Wave'
+creation | 11/01/2025 03:22:00 | création de l'opérateur 'Wave'
+ajout_index | 11/01/2025 03:22:00 | Ajout d'un nouvel index '79' avec 100 numéros
+sell_num | 11/01/2025 04:29:15 | numéro 791697108 vendu au client 'test'
+sell_credit | 11/01/2025 04:30:34 | 500 | Le client '791697108' a pris 500 crédits
+sell_credit | 11/01/2025 04:31:02 | 169 | Le client '791697108' a pris 169 crédits

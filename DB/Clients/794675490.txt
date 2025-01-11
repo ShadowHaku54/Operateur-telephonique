@@ -1,7 +1,0 @@
-username : salim
-numéro : 794675490
-opérateur : Orange
-code pin : 1234
-crédit : 250.0
-Liste des contacts :
-liste des appels :

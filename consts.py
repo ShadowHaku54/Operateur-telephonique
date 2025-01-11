@@ -6,14 +6,19 @@ FILE_CAISSE = "transactions.txt"
 FILE_REGISTRE = "registre.txt"
 FILE_INFO = "infos.txt"
 FILE_CONTACTS = "contacts.txt"
+FILE_HISTORIQUE = "historique.txt"
 DIR_INDEX = "Index"
 NUM_GENERES = 100
 BOOL_DISPO = "1"
 BOOL_NOT_DISPO = "0"
+BOOL_BLOCKED = "1"
+BOOL_NOT_BLOCKED = "0"
 STYLE_DISPO = "bold bright_green"
 STYLE_NOT_DISPO = "bold bright_red"
 CREDIT_MINIMUN = 100
 DEFAULT_LINES_SPACES = 1
+LIMIT_NB_INDEX = 3
+LIMIT_NB_CONTACTS_CLIENT = 3
 
 USER_GESTIONNAIRE = "Gestionnaire"
 USER_CLIENT = "Client"
@@ -69,7 +74,7 @@ ERROR_MESSAGES = {
     KEY_LENGTH_CODE_PIN : f"Le code PIN doit comporter {LENGTH_CODE_PIN} chiffres!",
     KEY_INCORRECT_CODE_PIN : "Mauvais code pin",
     KEY_NONE : "",
-    KEY_RESPECT_CREDIT: f"Nombre de crédit invalide (entier >= {CREDIT_MINIMUN})",
+    KEY_RESPECT_CREDIT: f"Nombre de crédit invalide (* >= {CREDIT_MINIMUN})",
     KEY_NOT_FOUND : 'N/A',
 }
 
@@ -94,21 +99,44 @@ LEN_MENU_GESTIONNAIRE = len(MENU_GESTIONNAIRE)
 MENU_CLIENT = [
     "Consulter son crédit",
     "Transférer du crédit",
-    "Effectuer un appel",
-    "Voir l’historique des appels (vocaux)",
-    "Écouter un vocal",
-    "Supprimer un vocal",
-    "Ajouter un contact",
-    "Supprimer un contact",
-    "Renommer un contact ",
-    "Ajouter un autre numéro à un contact existant",
-    "Afficher le répertoire ",
-    "Recherche un contact du répertoire par un mot clé",
-    "Bloquer / débloquer un contact",
+    "Gestion des contacts et appels",
+    "Gestion de l'historique des vocaux",
     "Se déconnecter",
     "Quitter",
 ]
+
 LEN_MENU_CLIENT = len(MENU_CLIENT)
+
+MEMUN_GESTION_HISTORIQUE = {
+    'C' : "choisir",
+    'Q' : "quitter",
+}
+
+MENU_GESTION_VOCAUX = {
+    'E': "écouter",
+    'S': "supprimer",
+    'R': "retour",
+    'Q': "quitter"
+}
+
+MEMU_GESTION_REPERTOIRE = {
+    'C': "choisir",
+    'E': "rechercher",
+    'A': "Ajouter un contact",
+    'P': "passer un appel",
+    'R': "retour",
+    'Q': "quitter"
+}
+
+MENU_GESTION_CONTACT = {
+    'A': "appeler",
+    'N': "renommer",
+    'B': "bloquer",
+    'D': "débloquer",
+    'R': "retour",
+    'Q': "quitter"
+}
+
 
 KEY_TITLE = "tilte"
 KEY_OPTIONS = "options"
@@ -117,12 +145,3 @@ KEY_ALTERN_COLORS = ""
 KEY_BORDER_PANEL_STYLE = ""
 KEY_INDEX_EXIST = ""
 
-
-STRUCT_MENU_GESTIONNAIRE = {
-    KEY_TITLE : " opérateur téléphonique ",
-    KEY_OPTIONS : MENU_GESTIONNAIRE,
-    KEY_TITLE_STYLE : "bold white",
-    KEY_ALTERN_COLORS : ("bright_yellow", "bright_green"),
-    KEY_BORDER_PANEL_STYLE : "bright_blue",
-    KEY_INDEX_EXIST : STYLE_DEFAULT_INDEX,
-}

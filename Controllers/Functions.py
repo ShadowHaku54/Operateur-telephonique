@@ -157,5 +157,21 @@ def take_any(sms, func_check_no_respect, no_respect_key, func_check_exist=None, 
     
     return valeur
 
+def take_numero(sms = "Entrer le numéro"):
+    numero = FuncViews.take_value(sms)
+    numero = FuncViews.reforme_num(numero)
+    already_error = False
+    while not check_repect_numero(numero):
+        FuncViews.processing(mode="error")
+        numero = FuncViews.take_value(sms, "error", "Numéro incorrect", already_error)
+        numero = FuncViews.reforme_num(numero)
+        
+        if not already_error:
+            already_error = True
+    FuncViews.processing()
+    return numero
+
+
 def aurevoir():
     FuncViews.display_aurevoir()
+    

@@ -1,0 +1,5 @@
+creation | 11/01/2025 03:21:36 | création de l'opérateur 'Breukh'
+ajout_index | 11/01/2025 03:21:36 | Ajout d'un nouvel index '74' avec 100 numéros
+ajout_index | 11/01/2025 03:23:28 | Ajout d'un nouvel index '71' avec 100 numéros
+sell_num | 11/01/2025 03:47:38 | numéro 711049486 vendu au client 'test'
+sell_credit | 11/01/2025 03:50:20 | 500 | Le client '711049486' a pris 500 crédits

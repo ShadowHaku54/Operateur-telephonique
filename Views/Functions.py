@@ -1,8 +1,8 @@
 # Functions - Views
+from shutil import get_terminal_size
 import time
 import sys
 import pyfiglet
-from shutil import get_terminal_size
 
 from rich.console import Console
 from rich.rule import Rule
@@ -74,7 +74,7 @@ def effacer_ligne():
     sys.stdout.write("\r")
     sys.stdout.flush()
 
-def continuer(sms="Appuyer pour retourner"):
+def continuer(sms="Appuyer sur [Enter] pour retourner"):
     console.input(f"\n[blue on black]{sms}...[/]")
     processing(go="back")
 

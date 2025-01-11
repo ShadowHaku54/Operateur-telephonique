@@ -2,7 +2,7 @@
 import os
 from consts import (
     PATH_DB_OPERATEURS, FILE_INFO, BOOL_DISPO, DIR_INDEX, CHAR_INDEX, PATH_DB_CLIENTS,
-    FILE_GESTIONNAIRES, FILE_REGISTRE
+    FILE_GESTIONNAIRES, FILE_REGISTRE, FILE_CONTACTS, FILE_HISTORIQUE
 )
 
 def add_new_operateur(operateur):
@@ -113,16 +113,26 @@ def collect_nums_index(nom_operateur, index):
 def recuperer_liste_operateur():
     return os.listdir(PATH_DB_OPERATEURS)
 
-def save_new_client(new_client):
-    path_file = os.path.join(PATH_DB_CLIENTS, f"{new_client["numero"]}.txt")
+def save_new_client(new_client, date):
+    path_dir = os.path.join(PATH_DB_CLIENTS, new_client["numero"])
+    os.makedirs(path_dir)
+    path_file = os.path.join(path_dir, FILE_INFO)
     with open(path_file, 'w', encoding="utf-8") as f:
-        f.write(f"username : {new_client["nom"]}\n")
+        f.write(f"username : {new_client["username"]}\n")
         f.write(f"numéro : {new_client["numero"]}\n")
         f.write(f"opérateur : {new_client["nom_operateur"]}\n")
         f.write(f"code pin : {new_client["code_pin"]}\n")
         f.write("crédit : 0\n")
-        f.write("Liste des contacts :\n")
-        f.write("liste des appels :\n")
+    
+    for path in (FILE_CONTACTS, FILE_HISTORIQUE):
+        path_gen = os.path.join(path_dir, path)
+        file = open(path_gen, 'w', encoding='utf-8')
+        file.close()
+    
+    file_registre = os.path.join(path_dir, FILE_REGISTRE)
+    with open(file_registre, 'w', encoding="utf-8") as f:
+        f.write(f"creation | {date} | création du client {new_client["username"]}\n")
+
 
 def recupere_gestionnaires():
     path_file = FILE_GESTIONNAIRES
@@ -130,21 +140,25 @@ def recupere_gestionnaires():
         contenu = f.read()
     return contenu.splitlines()
 
-def ajouter_credit_client(numero, credit):
-    path_file = os.path.join(PATH_DB_CLIENTS, f"{numero}.txt")
+def ajouter_credit_client(numero, credit, date):
+    path_file = os.path.join(PATH_DB_CLIENTS, numero, FILE_INFO)
     with open(path_file, 'r', encoding="utf-8")as f:
         lines = f.readlines()
     N = len(lines)
-    for i in range(N):
-        if lines[i].startswith("crédit :"):
-            ancien_credit = float(lines[i].split(':')[1])
-            nouveau_credit = ancien_credit + credit
-            lines[i] = f"crédit : {nouveau_credit}\n"
-            break
+    i = 0
+    while not lines[i].startswith("crédit :"):
+        i+=1
+    ancien_credit = float(lines[i].split(':')[1])
+    nouveau_credit = ancien_credit + credit
+    lines[i] = f"crédit : {nouveau_credit}\n"
     
     with open(path_file, 'w', encoding="utf-8") as f:
         for i in range(N):
             f.write(lines[i])
+    
+    file_registre_client = os.path.join(PATH_DB_CLIENTS, numero, FILE_REGISTRE)
+    with open(file_registre_client, 'a', encoding="utf-8") as f:
+        f.write(f"achat_credit | {date} | Achat de {credit} crédits chez le gestionnaire\n")
 
 
 def donnees_caisse(nom_operateur):

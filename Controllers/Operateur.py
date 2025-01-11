@@ -1,8 +1,9 @@
 import random
 from consts import (
     NUM_GENERES, MAX_CHAR_DEFAULT, MIN_CHAR_DEFAULT, MIN_INDEX, MAX_INDEX, BOOL_DISPO, BOOL_NOT_DISPO,
-    CODE_PIN_DEFAULT, LENGTH_CODE_PIN, KEY_EXIST, KEY_LENGTH_DEFAULT, KEY_NOT_EXIST, KEY_LENGTH_INDEX, 
-    KEY_INT_POS, USER_GESTIONNAIRE, COLOR_USER_GESTION, MENU_GESTIONNAIRE, TIME_LECTURE_UNIQUE, LEN_MENU_GESTIONNAIRE
+    CODE_PIN_DEFAULT, LENGTH_CODE_PIN, KEY_EXIST, KEY_LENGTH_DEFAULT, KEY_NOT_EXIST, KEY_LENGTH_INDEX,
+    KEY_INT_POS, USER_GESTIONNAIRE, COLOR_USER_GESTION, MENU_GESTIONNAIRE, TIME_LECTURE_UNIQUE,
+    LEN_MENU_GESTIONNAIRE, LIMIT_NB_INDEX
 )
 from Controllers import Functions as FuncControllers
 from Views import Functions as FuncViews, Operateur as OpViews
@@ -142,17 +143,20 @@ def add_new_index(choix):
     header_gestionnaire(choix)
     
     nom_operateur = choisir_operateur()
-    new_index = create_new_index("Entrer le nouveau index")
-    OpModels.add_new_index(new_index, nom_operateur)
-    
-    FuncViews.succes_message("Nouvelle index ajouté avec succès")
-    
-    OpModels.update_registre(
-        nom_operateur,
-        "ajout_index",
-        FuncControllers.get_date(),
-        f"Ajout d'un nouvel index '{new_index["index"]}' avec {NUM_GENERES} numéros"
-    )
+    if len(OpModels.recupere_les_index_for_op(nom_operateur)) < LIMIT_NB_INDEX:
+        new_index = create_new_index("Entrer le nouveau index")
+        OpModels.add_new_index(new_index, nom_operateur)
+        
+        FuncViews.succes_message("Nouvelle index ajouté avec succès")
+        
+        OpModels.update_registre(
+            nom_operateur,
+            "ajout_index",
+            FuncControllers.get_date(),
+            f"Ajout d'un nouvel index '{new_index["index"]}' avec {NUM_GENERES} numéros"
+        )
+    else:
+        FuncViews.error_message_simple(f"L'opérateur '{nom_operateur}' a déjà atteint le nombre limite d'index ({LIMIT_NB_INDEX}) !")
     FuncViews.continuer()
 
 def rename_operate(choix):
@@ -196,8 +200,9 @@ def vendre_numero(choix):
     if not FuncControllers.confirmer(f"Enregistrer le client '{username}' avec le numéro {FuncViews.formated_num(numero)} ?"):
         return
     
-    client = dict(nom=username, numero=numero,nom_operateur=nom_operateur, code_pin=code_pin)
-    OpModels.save_new_client(client)
+    client = dict(username=username, numero=numero,nom_operateur=nom_operateur, code_pin=code_pin)
+    date = FuncControllers.get_date()
+    OpModels.save_new_client(client, date)
     
     liste_nums[choix_num][1] = BOOL_NOT_DISPO
     index = dict(index=nom_index, liste_nums=liste_nums)
@@ -209,7 +214,7 @@ def vendre_numero(choix):
     OpModels.update_registre(
         nom_operateur,
         "sell_num",
-        FuncControllers.get_date(),
+        date,
         f"numéro {numero} vendu au client '{username}'"
     )
     
@@ -333,21 +338,27 @@ def check_index_can_be_del(nom_operateur, index):
 
 def vendre_credit(choix):
     header_gestionnaire(choix)
-    numero, nom_operateur = take_numero()
+    numero = FuncControllers.take_numero()
     credit = FuncControllers.take_credit()
-    FuncViews.warning_message(f"Envoyé {credit} F CFA au {numero}")
-    if not FuncControllers.confirmer():
-        return
-    OpModels.ajouter_credit_client(numero, credit)
-    
-    OpModels.update_registre(
-        nom_operateur,
-        "sell_credit",
-        FuncControllers.get_date(),
-        f"Le client '{numero}' a pris {credit} crédits",
-        value=credit
-    )
-    FuncViews.succes_message(f"{credit} crédits envoyé au client {numero}")
+    nom_operateur = FuncControllers.operateur_of_numero_client(numero)
+    if nom_operateur:
+        FuncViews.warning_message(f"Envoyé {credit} F CFA au {numero}")
+        if not FuncControllers.confirmer():
+            return
+        
+        date = FuncControllers.get_date()
+        OpModels.ajouter_credit_client(numero, credit, date)
+        
+        OpModels.update_registre(
+            nom_operateur,
+            "sell_credit",
+            date,
+            f"Le client '{numero}' a pris {credit} crédits",
+            value=credit
+        )
+        FuncViews.succes_message(f"{credit} crédits envoyé au client {numero}")
+    else:
+        FuncViews.error_message("Le numéro saisie n'est pas attribué")
     FuncViews.continuer()
 
 def numeros_operateur(nom_operateur):
@@ -365,23 +376,6 @@ def afficher_numeros_operateur(choix):
     OpViews.tableau_numeros(liste_nums)
     FuncViews.continuer()
 
-
-def take_numero(sms = "Entrer le numéro du client"):
-    numero = FuncViews.take_value(sms)
-    numero = FuncViews.reforme_num(numero)
-    nom_operateur = FuncControllers.operateur_of_numero_client(numero)
-    already_error = False
-    while(not nom_operateur):
-        FuncViews.processing(mode="error")
-        numero = FuncViews.take_value(sms, "error", "client introuvable", already_error)
-        
-        numero = FuncViews.reforme_num(numero)
-        nom_operateur = FuncControllers.operateur_of_numero_client(numero)
-        
-        if not already_error:
-            already_error = True
-    FuncViews.processing()
-    return numero, nom_operateur
 
 def etat_caisse(choix):
     liste_op = OpModels.recuperer_liste_operateur()
@@ -414,11 +408,11 @@ def get_ff_text_date(filtre):
 
 def take_choix_filtre(sms="Filtres: (J)our, (M)ois, (A)nnée | (Q)uitter "):
     choices = ['J', 'M', 'A', 'Q']
-    choix = FuncViews.take_choice(sms).upper()
+    choix = FuncViews.take_choice(sms)
     already_error = False
-    while choix not in choices:
+    while choix.upper() not in choices:
         FuncViews.processing(mode="error")
-        choix = FuncViews.take_choice(sms, mode_affichage="error", already_error=already_error).upper()
+        choix = FuncViews.take_choice(sms, mode_affichage="error", already_error=already_error)
         if not already_error:
             already_error = True
     if choix == 'Q':

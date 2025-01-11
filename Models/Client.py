@@ -1,19 +1,16 @@
 # Client - Models
 import os
-from consts import PATH_DB_CLIENTS
+from consts import PATH_DB_CLIENTS, FILE_CONTACTS, FILE_HISTORIQUE, FILE_INFO, FILE_REGISTRE
 
 def recuperer_numeros():
-    path_file = PATH_DB_CLIENTS
-    liste_nums = []
-    for dir_client in os.listdir(path_file):
-        numero = dir_client.split('.')[0]
-        liste_nums.append(numero)
-    return liste_nums
+    return os.listdir(PATH_DB_CLIENTS)
+
 
 def update_credit_client(numero, credit, add=True):
-    path_file = os.path.join(PATH_DB_CLIENTS, f"{numero}.txt")
+    path_file = os.path.join(PATH_DB_CLIENTS, numero, FILE_INFO)
     with open(path_file, 'r', encoding="utf-8")as f:
         lines = f.readlines()
+
     N = len(lines)
     for i in range(N):
         if lines[i].startswith("crédit :"):
@@ -31,7 +28,7 @@ def update_credit_client(numero, credit, add=True):
 
 
 def recuperer_element_in_file(numero, element):
-    path_file = os.path.join(PATH_DB_CLIENTS, f"{numero}.txt")
+    path_file = os.path.join(PATH_DB_CLIENTS, numero, FILE_INFO)
     with open(path_file, 'r', encoding="utf-8") as f:
         line = f.readline()
         while line and not line.startswith(element):
@@ -47,3 +44,25 @@ def recuperer_code_pin(numero):
 
 def recuperer_credit(numero):
     return float(recuperer_element_in_file(numero, "crédit :"))
+
+def update_registre(numero, type_update, date, commentaire):
+    file_registre = os.path.join(PATH_DB_CLIENTS, numero, FILE_REGISTRE)
+    with open(file_registre, "a", encoding='utf-8') as f:
+        f.write(f"{type_update} | {date} | {commentaire}\n")
+        
+
+def recuperer_contacts(numero):
+    path_file = os.path.join(PATH_DB_CLIENTS, numero, FILE_CONTACTS)
+    contacts = {}
+    with open(path_file, 'r', encoding="utf-8") as f:
+        for line in f:
+            ff_ligne = sup_char_retour_line(line)
+            nom_contact, flag, liste_nums = ff_ligne.split(' | ')
+            contacts[nom_contact] = {"flag": flag, "liste_nums": liste_nums.split(', ')}
+    return contacts
+
+
+def sup_char_retour_line(chaine):
+    if chaine[-1] == '\n':
+        return chaine[:-1]
+    return chaine

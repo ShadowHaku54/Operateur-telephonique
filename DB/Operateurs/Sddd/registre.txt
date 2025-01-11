@@ -1,3 +1,0 @@
-creation | 10/01/2025 19:24:31 | création de l'opérateur 'Test'
-ajout_index | 10/01/2025 19:24:31 | Ajout d'un nouvel index '73' avec 100 numéros
-rename_op | 10/01/2025 19:25:48 | opérateur 'Test' renommé en 'Sddd'

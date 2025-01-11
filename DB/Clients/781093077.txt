@@ -1,7 +1,0 @@
-username : test
-numéro : 781093077
-opérateur : Orange
-code pin : 1234
-crédit : 377
-Liste des contacts :
-liste des appels :
