@@ -1,0 +1,7 @@
+username : user
+numéro : 789999828
+opérateur : Orange
+code pin : 1234
+crédit : 225.0
+Liste des contacts :
+liste des appels :

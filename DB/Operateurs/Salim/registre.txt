@@ -1,0 +1,5 @@
+creation | 10/01/2025 17:06:50 | création de l'opérateur 'Salim'
+ajout_index | 10/01/2025 17:06:50 | Ajout d'un nouvel index '74' avec 100 numéros
+sell_num | 10/01/2025 17:07:53 | numéro 741095671 vendu au client 'salim'
+sell_credit | 10/01/2025 18:03:33 | 500 | Le client '741095671' a pris 500 crédits
+ajout_index | 10/01/2025 19:56:14 | Ajout d'un nouvel index '70' avec 100 numéros

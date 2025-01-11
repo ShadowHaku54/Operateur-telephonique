@@ -1,12 +1,57 @@
 import random
 from consts import (
     NUM_GENERES, MAX_CHAR_DEFAULT, MIN_CHAR_DEFAULT, MIN_INDEX, MAX_INDEX, BOOL_DISPO, BOOL_NOT_DISPO,
-    CODE_PIN_DEFAULT, LENGTH_CODE_PIN, KEY_EXIST, KEY_LENGTH_DEFAULT, KEY_NONE, KEY_NOT_EXIST, KEY_LENGTH_INDEX, 
-    KEY_INT_POS, USER_GESTIONNAIRE, COLOR_USER_GESTION, MENU_GESTIONNAIRE, TIME_LECTURE_UNIQUE
+    CODE_PIN_DEFAULT, LENGTH_CODE_PIN, KEY_EXIST, KEY_LENGTH_DEFAULT, KEY_NOT_EXIST, KEY_LENGTH_INDEX, 
+    KEY_INT_POS, USER_GESTIONNAIRE, COLOR_USER_GESTION, MENU_GESTIONNAIRE, TIME_LECTURE_UNIQUE, LEN_MENU_GESTIONNAIRE
 )
 from Controllers import Functions as FuncControllers
 from Views import Functions as FuncViews, Operateur as OpViews
 from Models import Operateur as OpModels
+
+def menu_gestionnaire_interactif():
+    FuncViews.afficher_tritre_principal_styler()
+    FuncViews.afficher_titre_section_styler(USER_GESTIONNAIRE, COLOR_USER_GESTION)
+    FuncViews.lines_spaces(2)
+    FuncViews.afficher_menu("Menu principal : Gestion des Opérateurs", MENU_GESTIONNAIRE)
+    choix = FuncViews.take_choice(default="1")
+    already_error = False
+    max_choice = len(MENU_GESTIONNAIRE)
+    while not FuncControllers.check_choix_in_marge(choix, maxi=max_choice):
+        FuncViews.processing(mode="error")
+        choix = FuncViews.take_choice(mode_affichage="error", default="1", already_error=already_error)
+        if not already_error:
+            already_error = True
+    FuncViews.processing()
+    return int(choix) - 1
+
+
+def header_gestionnaire(choix, spaces=2):
+    FuncViews.afficher_tritre_principal_styler()
+    FuncViews.afficher_titre_section_styler(USER_GESTIONNAIRE, COLOR_USER_GESTION)
+    FuncViews.afficher_titre_operation_styler(MENU_GESTIONNAIRE[choix])
+    FuncViews.lines_spaces(spaces)
+
+def use_case_gestionnaire():
+    func = [
+        create_new_op,
+        rename_operate,
+        lister_operateurs_et_index,
+        afficher_numeros_operateur,
+        add_new_index,
+        supprimer_index,
+        vendre_numero,
+        vendre_credit,
+        etat_caisse,
+    ]
+    
+    while True:
+        choix = menu_gestionnaire_interactif()
+        if choix == LEN_MENU_GESTIONNAIRE-1:
+            return True
+        elif choix == LEN_MENU_GESTIONNAIRE-2:
+            return False
+    
+        func[choix](choix)
 
 
 def generate_nums_for_index(index):
@@ -27,47 +72,9 @@ def generate_nums_for_index(index):
     return sorted(numeros)
 
 
-def take_any(sms, func_check_no_respect, no_respect_key, func_check_exist=None, adv_exist_message="", exist_mode=KEY_NONE):
-    
-    existence_check = {
-        KEY_EXIST : lambda nom: func_check_exist(nom),
-        KEY_NOT_EXIST : lambda nom: not func_check_exist(nom),
-        KEY_NONE : lambda nom: False,
-    }
-    
-    
-    valeur = FuncViews.take_value(sms)
-    
-    no_respect = not func_check_no_respect(valeur)
-    existence = existence_check[exist_mode](valeur)
-    
-    existence_message = FuncControllers.get_error_message(exist_mode)
-    no_respect_message = FuncControllers.get_error_message(no_respect_key)
-    
-    already_error = False
-    while no_respect or existence:
-        FuncViews.processing(mode="error")
-        
-        adv = adv_exist_message.format(valeur=valeur, existence_message=existence_message) if existence else no_respect_message
-        valeur = FuncViews.take_value(
-            sms, mode_affichage="error",
-            advertissement = adv,
-            already_error=already_error,
-        )
-        
-        no_respect = not func_check_no_respect(valeur)
-        existence = existence_check[exist_mode](valeur)
-        
-        if not already_error:
-            already_error = True
-    
-    FuncViews.processing()
-    
-    return valeur
-
 def take_nom_operateur(exist_mode, sms="Saisir le nom de l'opérateur"):
     adv_exist_message = "l'opérateur '{valeur}' {existence_message}"
-    return take_any(sms, check_respect_name, KEY_LENGTH_DEFAULT, check_operate_exist, adv_exist_message, exist_mode).capitalize()
+    return FuncControllers.take_any(sms, check_respect_name, KEY_LENGTH_DEFAULT, check_operate_exist, adv_exist_message, exist_mode).capitalize()
 
 
 def check_index_exist(index, nom_operateur=None):
@@ -82,16 +89,17 @@ def take_index(exist_mode, sms, nom_operateur=None):
     
     func_check_exist = lambda index : check_index_exist(index, nom_operateur)
     
-    return take_any(sms, check_respect_index, KEY_LENGTH_INDEX, func_check_exist, adv_message, exist_mode)
+    return FuncControllers.take_any(sms, check_respect_index, KEY_LENGTH_INDEX, func_check_exist, adv_message, exist_mode)
 
 def take_entier_positif(sms):
-    return take_any(sms, FuncControllers.est_un_entierPos, KEY_INT_POS)
+    return FuncControllers.take_any(sms, FuncControllers.est_un_entier_pos, KEY_INT_POS)
+
 
 def check_respect_name(nom):
     return FuncControllers.est_chaine_valide(nom, MIN_CHAR_DEFAULT, MAX_CHAR_DEFAULT)
 
 def check_respect_index(index):
-    return FuncControllers.est_un_entierPos(index) and  MIN_INDEX <= int(index) <= MAX_INDEX
+    return FuncControllers.est_un_entier_pos(index) and  MIN_INDEX <= int(index) <= MAX_INDEX
 
 def check_operate_exist(name_op : str):
     return name_op.capitalize() in OpModels.recuperer_liste_operateur()
@@ -112,7 +120,7 @@ def create_new_op(choix):
     
     OpModels.add_new_index(index, operateur["nom_operateur"])
     
-    FuncViews.succes_message("Operateur créer avec succes")
+    FuncViews.succes_message(f"Operateur '{operateur['nom_operateur']}' créer avec succes")
     
     OpModels.update_registre(
         operateur["nom_operateur"],
@@ -120,6 +128,8 @@ def create_new_op(choix):
         operateur["date_creation"],
         f"Ajout d'un nouvel index '{index["index"]}' avec {NUM_GENERES} numéros"
     )
+    
+    FuncViews.continuer()
 
 
 def create_new_index(sms="Entrer l'index"):
@@ -143,6 +153,7 @@ def add_new_index(choix):
         FuncControllers.get_date(),
         f"Ajout d'un nouvel index '{new_index["index"]}' avec {NUM_GENERES} numéros"
     )
+    FuncViews.continuer()
 
 def rename_operate(choix):
     header_gestionnaire(choix)
@@ -201,6 +212,8 @@ def vendre_numero(choix):
         FuncControllers.get_date(),
         f"numéro {numero} vendu au client '{username}'"
     )
+    
+    FuncViews.continuer()
 
 def choisir_operateur(is_one_element=True, end_txt="index"):
     liste_operateurs = OpModels.recuperer_liste_operateur()
@@ -213,7 +226,7 @@ def choisir_operateur(is_one_element=True, end_txt="index"):
         FuncViews.processing(TIME_LECTURE_UNIQUE)
         return op
 
-    FuncViews.afficher_menu("Liste des opérateurs disponible", liste_operateurs)
+    FuncViews.afficher_menu("Les opérateurs disponible", liste_operateurs)
     choix = FuncViews.take_choice(default="1")
 
     already_error = False
@@ -236,7 +249,7 @@ def choisir_index(nom_operateur, is_one_element=True):
         FuncViews.processing(TIME_LECTURE_UNIQUE)
         return ind
     
-    FuncViews.afficher_menu(f"Liste des index disponibles pour [{nom_operateur}]", liste_index,)
+    FuncViews.afficher_menu(f"Les index disponibles pour [{nom_operateur}]", liste_index,)
     choix = FuncViews.take_choice(default="1")
     already_error = False
     while not FuncControllers.check_choix_in_marge(choix, maxi=len_ind):
@@ -268,10 +281,10 @@ def check_choix_numero(choix, liste_nums):
     return numero[1] == BOOL_DISPO
 
 def take_name_client(sms):
-    return take_any(sms, check_respect_name, KEY_LENGTH_DEFAULT)
+    return FuncControllers.take_any(sms, check_respect_name, KEY_LENGTH_DEFAULT)
 
 def check_code_pin(code_saisie):
-    return FuncControllers.est_un_entierPos(code_saisie) and len(code_saisie) == LENGTH_CODE_PIN
+    return FuncControllers.est_un_entier_pos(code_saisie) and len(code_saisie) == LENGTH_CODE_PIN
 
 def take_code_pin_client(sms):
     code_pin = FuncViews.take_password(sms, default=CODE_PIN_DEFAULT)
@@ -321,7 +334,7 @@ def check_index_can_be_del(nom_operateur, index):
 def vendre_credit(choix):
     header_gestionnaire(choix)
     numero, nom_operateur = take_numero()
-    credit = take_credit()
+    credit = FuncControllers.take_credit()
     FuncViews.warning_message(f"Envoyé {credit} F CFA au {numero}")
     if not FuncControllers.confirmer():
         return
@@ -352,44 +365,23 @@ def afficher_numeros_operateur(choix):
     OpViews.tableau_numeros(liste_nums)
     FuncViews.continuer()
 
-def header_gestionnaire(choix, spaces=2):
-    FuncViews.afficher_tritre_principal_styler()
-    FuncViews.afficher_titre_section_styler(USER_GESTIONNAIRE, COLOR_USER_GESTION)
-    FuncViews.afficher_titre_operation_styler(MENU_GESTIONNAIRE[choix])
-    FuncViews.lines_spaces(spaces)
-
-def use_case_gestionnaire(choix):
-    func = [
-        create_new_op,
-        rename_operate,
-        lister_operateurs_et_index,
-        afficher_numeros_operateur,
-        add_new_index,
-        supprimer_index,
-        vendre_numero,
-        vendre_credit,
-        etat_caisse,
-    ]
-    
-    func[choix](choix)
 
 def take_numero(sms = "Entrer le numéro du client"):
     numero = FuncViews.take_value(sms)
+    numero = FuncViews.reforme_num(numero)
     nom_operateur = FuncControllers.operateur_of_numero_client(numero)
     already_error = False
     while(not nom_operateur):
         FuncViews.processing(mode="error")
         numero = FuncViews.take_value(sms, "error", "client introuvable", already_error)
         
+        numero = FuncViews.reforme_num(numero)
         nom_operateur = FuncControllers.operateur_of_numero_client(numero)
         
         if not already_error:
             already_error = True
     FuncViews.processing()
     return numero, nom_operateur
-
-def take_credit(sms = "Entrer le nombre de crédit à envoyer"):
-    return int(take_entier_positif(sms))
 
 def etat_caisse(choix):
     liste_op = OpModels.recuperer_liste_operateur()

@@ -1,7 +1,6 @@
 # Functions - Views
 import time
 import sys
-# from os import system as osSystem
 import pyfiglet
 from shutil import get_terminal_size
 
@@ -13,12 +12,11 @@ from rich.panel import Panel
 from rich.prompt import Prompt
 console = Console()
 
-from consts import TAB, MAIN_TITLE, STYLE_DEFAULT_INDEX, DEFAULT_LINES_SPACES, PROCESSING_COUPURE, BG_COLOR_HEXA
+from consts import TAB, MAIN_TITLE, STYLE_DEFAULT_INDEX, DEFAULT_LINES_SPACES, PROCESSING_COUPURE, BG_COLOR_HEXA, WARNING_STYLE
 
 
 def effacer_ecran():
     print("\033c", end="")
-    # osSystem("cls")
 
 
 def lines_spaces(nb_lignes=DEFAULT_LINES_SPACES):
@@ -59,7 +57,7 @@ def processing_sous_func(mode, go, largeur_barre):
         coupure = 0
 
     if go=="go":
-        range_go = range(0, largeur_barre+1)  
+        range_go = range(0, largeur_barre+1)
     elif go=="back":
         range_go = range(largeur_barre+1, 0, -1)
 
@@ -68,7 +66,7 @@ def processing_sous_func(mode, go, largeur_barre):
 def remonter_ligne(nb_lignes):
     effacer_ligne()
     for _ in range(nb_lignes):
-        sys.stdout.write(f"\033[A")
+        sys.stdout.write("\033[A")
         effacer_ligne()
 
 def effacer_ligne():
@@ -77,7 +75,8 @@ def effacer_ligne():
     sys.stdout.flush()
 
 def continuer(sms="Appuyer pour retourner"):
-    console.input(f"[blue on black]{sms}...[/]")
+    console.input(f"\n[blue on black]{sms}...[/]")
+    processing(go="back")
 
 def take_value(message, mode_affichage="simple", advertissement = "", already_error=False):
     def saisie_simple(message):
@@ -135,15 +134,16 @@ def take_password(message="Entrez le mot de passe", mode_affichage="simple", alr
 
 
 def succes_message(message):
-    afficher_en_couleur(message, style="bold bright_white on bright_green")
+    afficher_en_couleur(message, style="bold bright_white on green")
 
 def error_message(message):
     afficher_en_couleur(">>> ERROR <<<", style="bold red on black", end="")
     afficher_en_couleur(f" {message.upper()} ", style="yellow on black", end="")
     afficher_en_couleur(">>> ERROR <<<", style="bold red on black")
 
-def warning_message(message):
-    afficher_en_couleur(message, style="bold #fe7b00 on black")
+
+def warning_message(message, end="\n"):
+    afficher_en_couleur(message, WARNING_STYLE, end=end)
 
 def error_message_simple(message):
     afficher_en_couleur(message, style="red on black")
@@ -167,13 +167,16 @@ def afficher_menu(
     border_panel_style="bright_blue", index_style="bright_cyan"
 ):
 
-    table = Table(show_header=False, show_edge=False, padding=(0, 4))
+    Taille = len(options)
+    decalage = len(str(Taille))
+    table = Table(show_header=False, show_edge=False, padding=(0, 3))
 
     len_altcol = len(altern_colors)
     
     for index, option in enumerate(options, start=1):
         color = altern_colors[index % len_altcol]
-        table.add_row(f"[{index_style}][{index}][/{index_style}]", f"[{color}]{option}[/{color}]")
+        index_ff = "{:>0{}}".format(index, decalage)
+        table.add_row(f"[{index_style}]{index_ff}[/] [{color}]➤[/]", f"[{color}]{option}[/{color}]")
         
 
     panel = Panel(
@@ -189,7 +192,7 @@ def afficher_menu(
 
 
 def afficher_en_couleur(message, style="green", end='\n'):
-    console.print(f"[{style}]{message}[/{style}]", end=end)
+    console.print(f"[{style}]{message}[/]", end=end)
 
 def ask_choice(message, style_sms="bold yellow", default=None, choices=None):
     afficher_en_couleur(message, style_sms, end="")
@@ -210,6 +213,9 @@ def lire(message, style_sms="bold bright_magenta"):
 
 def formated_num(numero):
     return f"{numero[:2]} {numero[2:5]} {numero[5:7]} {numero[7:]}"
+
+def reforme_num(numero):
+    return numero.replace(' ', '', count=3)
 
 def ask_password(sms, default=None):
     message_style = Text(sms, "bold bright_yellow")
@@ -260,3 +266,6 @@ def take_numero(sms1="Entrer le nom d'opérateur", sms2="Entrer le numéro", mod
 
     action = actions[mode_affichage]
     return action(sms1, sms2)
+
+def display_aurevoir():
+    print("Aurevoir")

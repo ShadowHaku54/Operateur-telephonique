@@ -116,7 +116,7 @@ def recuperer_liste_operateur():
 def save_new_client(new_client):
     path_file = os.path.join(PATH_DB_CLIENTS, f"{new_client["numero"]}.txt")
     with open(path_file, 'w', encoding="utf-8") as f:
-        f.write(f"nom : {new_client["nom"]}\n")
+        f.write(f"username : {new_client["nom"]}\n")
         f.write(f"numéro : {new_client["numero"]}\n")
         f.write(f"opérateur : {new_client["nom_operateur"]}\n")
         f.write(f"code pin : {new_client["code_pin"]}\n")
@@ -137,7 +137,7 @@ def ajouter_credit_client(numero, credit):
     N = len(lines)
     for i in range(N):
         if lines[i].startswith("crédit :"):
-            ancien_credit = int(lines[i].split(':')[1])
+            ancien_credit = float(lines[i].split(':')[1])
             nouveau_credit = ancien_credit + credit
             lines[i] = f"crédit : {nouveau_credit}\n"
             break
@@ -145,6 +145,7 @@ def ajouter_credit_client(numero, credit):
     with open(path_file, 'w', encoding="utf-8") as f:
         for i in range(N):
             f.write(lines[i])
+
 
 def donnees_caisse(nom_operateur):
     path_file = os.path.join(PATH_DB_OPERATEURS, nom_operateur, FILE_REGISTRE)

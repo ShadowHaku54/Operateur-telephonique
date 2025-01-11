@@ -12,13 +12,13 @@ BOOL_DISPO = "1"
 BOOL_NOT_DISPO = "0"
 STYLE_DISPO = "bold bright_green"
 STYLE_NOT_DISPO = "bold bright_red"
-
+CREDIT_MINIMUN = 100
 DEFAULT_LINES_SPACES = 1
 
 USER_GESTIONNAIRE = "Gestionnaire"
 USER_CLIENT = "Client"
 COLOR_USER_GESTION = "yellow"
-COLOR_SECT_CLIENT = "red"
+COLOR_SECT_CLIENT = "purple"
 
 MAX_CHAR_DEFAULT = 15
 MIN_CHAR_DEFAULT = 3
@@ -30,17 +30,18 @@ LENGTH_CODE_PIN = 4
 MAX_INDEX = 99
 MIN_INDEX = 10
 CHAR_INDEX = 2
+TAUX_TRANSFERT = 10/100
 
 SPACES_TAB = 4
 TAB = " "*SPACES_TAB
 
 STYLE_DEFAULT_INDEX = "bright_cyan"
-# STYLE_DEFAULT_INPUT = "cyan"
 
 
 BG_COLOR_HEXA = "on #282C34"
 BG_COLOR_SYS = ""
 
+WARNING_STYLE = "bold #fe7b00 on black"
 
 # Clés dictionnaires
 KEY_EXIST = "exist"
@@ -54,7 +55,7 @@ KEY_LENGTH_NUMB = "length_numero"
 KEY_NOT_EXIST_NUMB = "not_exist_for_num"
 KEY_LENGTH_CODE_PIN = "length_code_pin"
 KEY_INCORRECT_CODE_PIN = "incorrect_code_pin"
-
+KEY_RESPECT_CREDIT = "incorrect_credit"
 
 # DICTIONNAIRE
 ERROR_MESSAGES = {
@@ -68,6 +69,7 @@ ERROR_MESSAGES = {
     KEY_LENGTH_CODE_PIN : f"Le code PIN doit comporter {LENGTH_CODE_PIN} chiffres!",
     KEY_INCORRECT_CODE_PIN : "Mauvais code pin",
     KEY_NONE : "",
+    KEY_RESPECT_CREDIT: f"Nombre de crédit invalide (entier >= {CREDIT_MINIMUN})",
     KEY_NOT_FOUND : 'N/A',
 }
 
@@ -87,21 +89,26 @@ MENU_GESTIONNAIRE = [
     "Quitter"
 ]
 
+LEN_MENU_GESTIONNAIRE = len(MENU_GESTIONNAIRE)
+
 MENU_CLIENT = [
     "Consulter son crédit",
+    "Transférer du crédit",
     "Effectuer un appel",
     "Voir l’historique des appels (vocaux)",
     "Écouter un vocal",
+    "Supprimer un vocal",
+    "Ajouter un contact",
     "Supprimer un contact",
     "Renommer un contact ",
     "Ajouter un autre numéro à un contact existant",
     "Afficher le répertoire ",
-    "Recherche un contact du répertoire par un mot clé ",
+    "Recherche un contact du répertoire par un mot clé",
     "Bloquer / débloquer un contact",
-    "Transférer du crédit",
     "Se déconnecter",
     "Quitter",
 ]
+LEN_MENU_CLIENT = len(MENU_CLIENT)
 
 KEY_TITLE = "tilte"
 KEY_OPTIONS = "options"
