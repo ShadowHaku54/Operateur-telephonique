@@ -1,1 +1,0 @@
-nom_contact | blocage | numero1, numero2, numero3

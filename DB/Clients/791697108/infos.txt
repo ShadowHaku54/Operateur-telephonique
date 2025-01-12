@@ -1,5 +1,0 @@
-username : test
-numéro : 791697108
-opérateur : Wave
-code pin : 1234
-crédit : 669.0
