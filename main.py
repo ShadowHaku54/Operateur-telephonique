@@ -16,3 +16,6 @@ def main():
 if __name__ == "__main__":
     main()
 
+# from Models.Client import collect_historique
+
+# print(collect_historique("731006984"))

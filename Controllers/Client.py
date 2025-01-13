@@ -7,7 +7,7 @@ from consts import (
     USER_CLIENT, COLOR_SECT_CLIENT, MENU_CLIENT, LEN_MENU_CLIENT, TAUX_TRANSFERT
     , MENU_GESTION_REPERTOIRE, MENU_GESTION_CONTACT, LIMIT_NB_CONTACTS_CLIENT
     , BOOL_NOT_BLOCKED, BOOL_BLOCKED, MENU_CONTACT_FLITRE, FILE_SD_CALLING, FILE_SD_COUPURE
-    , NB_NUMBER_AFTER_COMMA
+    , NB_NUMBER_AFTER_COMMA, IS_NOT_ALREADY_READ, IS_ALREADY_READ
 )
 
 Client = {
@@ -51,6 +51,7 @@ def use_case_client():
         voir_credit,
         transfert_credit,
         gestion_repertoire,
+        historique_appels,
     ]
     
     while True:
@@ -201,20 +202,20 @@ def transfert_credit(choix_main_menu):
             if FuncControllers.confirmer(f"Envoie {debt_credit} | {credit_avec_taux} F CFA au '{FuncViews.formated_num(numero)}'. Confirmer?"):
                 ClientModels.update_credit_client(Client["numero"], new_solde_client, add=False)
                 ClientModels.update_credit_client(numero, credit_avec_taux)
-                FuncViews.succes_message(f"{debt_credit} crédits envoyé au {numero}")
-                FuncViews.succes_message(f"Nouveau solde {new_solde_client}")
+                FuncViews.succes_message(f"{credit_avec_taux} crédits envoyé au {numero}")
+                FuncViews.succes_message(f"Nouveau solde {new_solde_client}F")
                 date = FuncControllers.get_date()
                 ClientModels.update_registre(
                     Client['numero'],
                     "transfert_credit",
                     date,
-                    f"{debt_credit} crédits transférés au {numero}"
+                    f"{credit_avec_taux} crédits transférés au {numero}"
                 )
                 ClientModels.update_registre(
                     numero,
                     "receive_credit",
                     date,
-                    f"{debt_credit} crédits reçu du {Client['numero']}"
+                    f"{credit_avec_taux} crédits reçu du {Client['numero']}"
                 )
         else:
             FuncViews.error_message("Solde insuffisant")
@@ -223,6 +224,27 @@ def transfert_credit(choix_main_menu):
         FuncViews.error_message("Numéro invalide")
         FuncViews.error_message_simple("Ce numéro est soit d'un opérateur différent, soit est le votre ou soit n'a pas encore été attribué")
     FuncViews.continuer()
+
+
+def historique_appels(choix_main_menu):
+    header_client(choix_main_menu)
+    historique = ClientModels.collect_historique(Client["numero"])
+    ClientViews.afficher_historique(historique)
+    choix_lecture = take_choix_contact(len(historique), "Entrer la position pour lire", "Q", "pour quitter")
+    if choix_lecture != 'Q':
+        indice_audio = int(choix_lecture) - 1
+        audio = historique[indice_audio]
+        fic_audio = audio["fic_voc"]
+        FuncViews.afficher_en_couleur("Appuyer sur [Entrer] pour sortir du mode lecture.", end="")
+        ClientModels.lire_vocal(fic_audio)
+        FuncViews.warning_message("Arrêté/Interrompu")
+        if audio["vue"] == IS_NOT_ALREADY_READ:
+            audio["vue"] = IS_ALREADY_READ
+            ClientModels.update_historique_for_ecoute(Client["numero"], historique)
+        FuncViews.processing(go="back")
+        historique_appels(choix_main_menu)
+        return
+    FuncViews.processing(go="back")
 
 def check_numero_and_opeateur(numero):
     return Client["numero"] != numero and Client["operateur"] == FuncControllers.operateur_of_numero_client(numero)
@@ -433,14 +455,15 @@ def page_appel(nom_fichier, max_time, numero, tarif, solde, nom_contact=None):
         ClientModels.lire_audio_fin(FILE_SD_COUPURE)
         FuncViews.succes_message("Enregistrement terminé")
         
-        cout_appel = tarif * durree_appel
+        cout_appel = round(tarif * durree_appel, NB_NUMBER_AFTER_COMMA)
         if cout_appel > solde:
             cout_appel = solde
+        
         nouveau_solde = round(solde - cout_appel, NB_NUMBER_AFTER_COMMA)
         
         FuncViews.succes_message(f"Vocal envoyé au {FuncViews.formated_num(numero)}")
         FuncViews.succes_message(f"Durée: {durree_appel}s | tarif: {tarif}F/s | coût: {cout_appel}F")
-        FuncViews.succes_message(f"Nouveau solde: {nouveau_solde}")
+        FuncViews.succes_message(f"Nouveau solde: {nouveau_solde}F")
         
         ClientModels.update_credit_client(Client["numero"], nouveau_solde, False)
         

@@ -5,7 +5,7 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.columns import Columns
 from rich.box import DOUBLE_EDGE, ROUNDED, ASCII, HORIZONTALS
-from consts import BG_COLOR_HEXA, BOOL_BLOCKED, MENU_GESTION_CONTACT, MENU_GESTION_REPERTOIRE, MENU_CONTACT_FLITRE
+from consts import BG_COLOR_HEXA, BOOL_BLOCKED, MENU_GESTION_CONTACT, MENU_GESTION_REPERTOIRE, MENU_CONTACT_FLITRE, APPEL_ENTRANT, IS_NOT_ALREADY_READ
 from Views.Functions import formated_num
 console = Console()
 
@@ -147,3 +147,48 @@ def contact_appel(numero, nom_contact=None):
     
 def message_appel():
     console.print("[yellow]Entrer sur D pour enregistrer un vocal ou Q pour quitter[/]", "[cyan](D)[/]", ': ', end="")
+    
+
+def afficher_historique(historique):
+    table = Table(title="Historique des Appels", show_lines=True, padding=(0, 4))
+
+    table.add_column("#", justify="center", style="cyan")
+    table.add_column("sens")
+    table.add_column("Date", justify="center")
+    table.add_column("Heure", justify="center")
+    table.add_column("Numéro", justify="center")
+    table.add_column("Durée")
+    table.add_column("Coût")
+
+    N = len(historique)
+    nb_zero = len(str(N))
+    if N == 0:
+        table.add_row("N/A", *["---" for _ in range(6)])
+    else:
+        for indice in range(N):
+            appel = historique[indice]
+            ff_indice = f"{indice+1:>0{nb_zero}}"
+            color = "bold bright_red" if appel["type_appel"] == APPEL_ENTRANT else "bold bright_green"
+            fond_ecoute = "on black" if appel["vue"] == IS_NOT_ALREADY_READ else ""
+            style = f"{color} {fond_ecoute}"
+        
+            table.add_row(
+                ff_indice,
+                appel["type_appel"],
+                appel["date_day"],
+                appel["date_heure"],
+                formated_num(appel["numero_appel"]),
+                appel["duree"],
+                appel["cout"],
+                style=style
+            )
+
+            
+
+    contain = Panel(
+        table,
+        style="",
+        border_style="purple"
+    )
+    
+    console.print(contain, justify="center", style=BG_COLOR_HEXA)
