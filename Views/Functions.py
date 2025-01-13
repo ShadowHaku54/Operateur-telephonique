@@ -268,4 +268,14 @@ def take_numero(sms1="Entrer le nom d'opérateur", sms2="Entrer le numéro", mod
     return action(sms1, sms2)
 
 def display_aurevoir():
-    print("Aurevoir")
+
+    message_ascii = pyfiglet.figlet_format("Au Revoir!")
+    lines = message_ascii.split("\n")
+    console.print("\n")
+    for line in lines:
+        console.print(f"[bold magenta]{line}[/bold magenta]", justify='center', style="on black")
+        time.sleep(0.2)
+
+    console.print("✨\n[bold cyan]À bientôt ![/bold cyan] 💫", justify="center")
+    time.sleep(2)
+    effacer_ecran()
