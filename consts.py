@@ -2,6 +2,10 @@ MAIN_TITLE = " opérateur téléphonique "
 PATH_DB_OPERATEURS = r"./DB/Operateurs/"
 FILE_GESTIONNAIRES = r"./DB/Gestionnaires.txt"
 PATH_DB_CLIENTS = r"./DB/Clients/"
+PATH_DB_VOCAUX = r"./DB/Sounds/Vocaux/"
+PATH_DB_SOUNDS = r"./DB/Sounds/"
+FILE_SD_COUPURE = r"./DB/Sounds/coupure_appel.wav"
+FILE_SD_CALLING = r"./DB/Sounds/calling.wav"
 FILE_CAISSE = "transactions.txt"
 FILE_REGISTRE = "registre.txt"
 FILE_INFO = "infos.txt"
@@ -13,12 +17,17 @@ BOOL_DISPO = "1"
 BOOL_NOT_DISPO = "0"
 BOOL_BLOCKED = "1"
 BOOL_NOT_BLOCKED = "0"
+IS_ALREADY_READ = "1"
+IS_NOT_ALREADY_READ = "0"
+APPEL_ENTRANT = "in"
+APPEL_SORTANT = "out"
 STYLE_DISPO = "bold bright_green"
 STYLE_NOT_DISPO = "bold bright_red"
 CREDIT_MINIMUN = 100
 DEFAULT_LINES_SPACES = 1
 LIMIT_NB_INDEX = 3
 LIMIT_NB_CONTACTS_CLIENT = 3
+NB_NUMBER_AFTER_COMMA = 2
 
 USER_GESTIONNAIRE = "Gestionnaire"
 USER_CLIENT = "Client"
@@ -119,22 +128,28 @@ MENU_GESTION_VOCAUX = {
     'Q': "quitter"
 }
 
-MEMU_GESTION_REPERTOIRE = {
-    'C': "choisir",
-    'E': "rechercher",
+MENU_GESTION_REPERTOIRE = {
+    'S': "Sélectionner un contact",
+    'RE': "Rechercher un contact",
     'A': "Ajouter un contact",
-    'P': "passer un appel",
-    'R': "retour",
-    'Q': "quitter"
+    'C': "Composer un numéro (appel)",
+    'R': "Retour"
 }
 
 MENU_GESTION_CONTACT = {
-    'A': "appeler",
-    'N': "renommer",
-    'B': "bloquer",
-    'D': "débloquer",
-    'R': "retour",
-    'Q': "quitter"
+    'A': "Appeler",
+    'RN': "Renommer",
+    'AD': "Ajouter numéro",
+    'B': "Bloquer",
+    'D': "Débloquer",
+    'S': "Supprimer le contact",
+    'R': "Retour",
+}
+
+MENU_CONTACT_FLITRE = {
+    'S' : "Sélectionner",
+    'RE' : "Effectuer une autre recherche",
+    'R' : "Retour"
 }
 
 

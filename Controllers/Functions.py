@@ -1,8 +1,12 @@
 # Functions - Controllers
 from re import match as rem
 from datetime import datetime
+import hashlib
 from Views import Functions as FuncViews
-from consts import ERROR_MESSAGES, KEY_NOT_FOUND, CREDIT_MINIMUN, KEY_RESPECT_CREDIT, KEY_EXIST, KEY_NONE, KEY_NOT_EXIST
+from consts import (
+    ERROR_MESSAGES, KEY_NOT_FOUND, CREDIT_MINIMUN, KEY_RESPECT_CREDIT, 
+    KEY_EXIST, KEY_NONE, KEY_NOT_EXIST, MIN_CHAR_DEFAULT, KEY_LENGTH_DEFAULT, MAX_CHAR_DEFAULT
+)
 from Models.Client import (
     recuperer_numeros as MC_recuperer_numeros, 
     recuperer_code_pin as MC_recuperer_code_pin, 
@@ -22,6 +26,14 @@ def get_date(short="all"):
         return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     elif short == "short":
         return datetime.now().strftime("%d/%m/%Y")
+
+def generer_nom_unique(*chaines):
+    date_actuelle = get_date()
+    base_str = f"{date_actuelle}" + "".join(list(chaines))
+
+    hash_obj = hashlib.sha256(base_str.encode())
+    nom_unique = hash_obj.hexdigest()[:16]
+    return nom_unique
 
 
 def get_error_message(key):
@@ -175,3 +187,10 @@ def take_numero(sms = "Entrer le numéro"):
 def aurevoir():
     FuncViews.display_aurevoir()
     
+
+def check_respect_name(nom):
+    return est_chaine_valide(nom, MIN_CHAR_DEFAULT, MAX_CHAR_DEFAULT)
+
+def take_name(sms):
+    return take_any(sms, check_respect_name, KEY_LENGTH_DEFAULT)
+

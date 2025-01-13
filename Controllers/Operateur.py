@@ -1,6 +1,6 @@
 import random
 from consts import (
-    NUM_GENERES, MAX_CHAR_DEFAULT, MIN_CHAR_DEFAULT, MIN_INDEX, MAX_INDEX, BOOL_DISPO, BOOL_NOT_DISPO,
+    NUM_GENERES, MIN_INDEX, MAX_INDEX, BOOL_DISPO, BOOL_NOT_DISPO,
     CODE_PIN_DEFAULT, LENGTH_CODE_PIN, KEY_EXIST, KEY_LENGTH_DEFAULT, KEY_NOT_EXIST, KEY_LENGTH_INDEX,
     KEY_INT_POS, USER_GESTIONNAIRE, COLOR_USER_GESTION, MENU_GESTIONNAIRE, TIME_LECTURE_UNIQUE,
     LEN_MENU_GESTIONNAIRE, LIMIT_NB_INDEX
@@ -75,7 +75,7 @@ def generate_nums_for_index(index):
 
 def take_nom_operateur(exist_mode, sms="Saisir le nom de l'opérateur"):
     adv_exist_message = "l'opérateur '{valeur}' {existence_message}"
-    return FuncControllers.take_any(sms, check_respect_name, KEY_LENGTH_DEFAULT, check_operate_exist, adv_exist_message, exist_mode).capitalize()
+    return FuncControllers.take_any(sms, FuncControllers.check_respect_name, KEY_LENGTH_DEFAULT, check_operate_exist, adv_exist_message, exist_mode).capitalize()
 
 
 def check_index_exist(index, nom_operateur=None):
@@ -96,8 +96,6 @@ def take_entier_positif(sms):
     return FuncControllers.take_any(sms, FuncControllers.est_un_entier_pos, KEY_INT_POS)
 
 
-def check_respect_name(nom):
-    return FuncControllers.est_chaine_valide(nom, MIN_CHAR_DEFAULT, MAX_CHAR_DEFAULT)
 
 def check_respect_index(index):
     return FuncControllers.est_un_entier_pos(index) and  MIN_INDEX <= int(index) <= MAX_INDEX
@@ -194,7 +192,7 @@ def vendre_numero(choix):
     if not FuncControllers.confirmer():
         return
     
-    username = take_name_client("Entrer un nom d'utilisateur")
+    username = FuncControllers.take_name("Entrer un nom d'utilisateur")
     code_pin = take_code_pin_client("Entrer le code pin")
     
     if not FuncControllers.confirmer(f"Enregistrer le client '{username}' avec le numéro {FuncViews.formated_num(numero)} ?"):
@@ -285,8 +283,6 @@ def check_choix_numero(choix, liste_nums):
     numero = liste_nums[int(choix)-1]
     return numero[1] == BOOL_DISPO
 
-def take_name_client(sms):
-    return FuncControllers.take_any(sms, check_respect_name, KEY_LENGTH_DEFAULT)
 
 def check_code_pin(code_saisie):
     return FuncControllers.est_un_entier_pos(code_saisie) and len(code_saisie) == LENGTH_CODE_PIN
@@ -420,7 +416,7 @@ def take_choix_filtre(sms="Filtres: (J)our, (M)ois, (A)nnée | (Q)uitter "):
     else:
         FuncViews.processing()
     
-    return choix
+    return choix.upper()
 
 def filtre_etat_caisse(caisses_ops, caisses_op_filtrer, ff_date):
     for op, dates in caisses_ops.items():
