@@ -1,5 +1,0 @@
-username : test
-numéro : 711049486
-opérateur : Breukh
-code pin : 1234
-crédit : 500.0

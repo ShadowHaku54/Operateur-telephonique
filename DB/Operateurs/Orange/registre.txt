@@ -1,8 +1,0 @@
-creation | 11/01/2025 03:18:31 | création de l'opérateur 'Orange'
-ajout_index | 11/01/2025 03:18:31 | Ajout d'un nouvel index '78' avec 100 numéros
-ajout_index | 11/01/2025 03:21:15 | Ajout d'un nouvel index '76' avec 100 numéros
-ajout_index | 11/01/2025 03:30:09 | Ajout d'un nouvel index '70' avec 100 numéros
-sell_num | 11/01/2025 03:52:34 | numéro 701735306 vendu au client 'test'
-sell_num | 11/01/2025 03:54:34 | numéro 763581726 vendu au client 'test'
-sell_credit | 11/01/2025 03:57:07 | 150 | Le client '701735306' a pris 150 crédits
-sell_credit | 11/01/2025 04:04:09 | 1000 | Le client '763581726' a pris 1000 crédits

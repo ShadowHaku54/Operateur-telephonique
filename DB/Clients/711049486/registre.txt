@@ -1,2 +1,0 @@
-creation | 11/01/2025 03:47:38 | création du client test
-achat_credit | 11/01/2025 03:50:20 | Achat de 500 crédits chez le gestionnaire
