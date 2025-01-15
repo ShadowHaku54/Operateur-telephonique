@@ -134,22 +134,26 @@ def enregistrer_vocal_wav(nom_fichier, duree):
 
 def lire_audio_avec_arret(nom_fichier):
     stop_event = threading.Event()
-    user_input = []
+    user_input = [None]
 
     def attendre_arret_utilisateur():
-        user_input.append(input())
+        user_input[0] = input()
         stop_event.set()
-    
-    data, samplerate = sf.read(nom_fichier)
-    threading.Thread(target=attendre_arret_utilisateur, daemon=True).start()
 
-    with sd.OutputStream(samplerate=samplerate, channels=data.shape[1] if len(data.shape) > 1 else 1):
-        sd.play(data, samplerate)
-        while not stop_event.is_set():
-            sd.sleep(100)
-        sd.stop()
-    
+    data, samplerate = sf.read(nom_fichier)
+
+    def lire_audio():
+        with sd.OutputStream(samplerate=samplerate, channels=data.shape[1] if len(data.shape) > 1 else 1):
+            sd.play(data, samplerate)
+            while not stop_event.is_set() and sd.get_stream().active:
+                sd.sleep(100)
+            sd.stop()
+
+    threading.Thread(target=attendre_arret_utilisateur, daemon=True).start()
+    lire_audio()
+
     return user_input[0]
+
 
 def lire_audio_fin(nom_fichier):
     data, samplerate = sf.read(nom_fichier)

@@ -237,11 +237,11 @@ def historique_appels(choix_main_menu):
         fic_audio = audio["fic_voc"]
         FuncViews.afficher_en_couleur("Appuyer sur [Entrer] pour sortir du mode lecture.", end="")
         ClientModels.lire_vocal(fic_audio)
-        FuncViews.warning_message("Arrêté/Interrompu")
+        FuncViews.warning_message("Vocal arrêté ou fini")
+        FuncViews.continuer()
         if audio["vue"] == IS_NOT_ALREADY_READ:
             audio["vue"] = IS_ALREADY_READ
             ClientModels.update_historique_for_ecoute(Client["numero"], historique)
-        FuncViews.processing(go="back")
         historique_appels(choix_main_menu)
         return
     FuncViews.processing(go="back")

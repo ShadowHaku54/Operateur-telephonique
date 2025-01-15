@@ -185,8 +185,8 @@ def take_numero(sms = "Entrer le numéro"):
 
 
 def aurevoir():
+    FuncViews.processing(go="back")
     FuncViews.display_aurevoir()
-    
 
 def check_respect_name(nom):
     return est_chaine_valide(nom, MIN_CHAR_DEFAULT, MAX_CHAR_DEFAULT)

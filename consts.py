@@ -57,7 +57,6 @@ BG_COLOR_SYS = ""
 
 WARNING_STYLE = "bold #fe7b00 on black"
 
-# Clés dictionnaires
 KEY_EXIST = "exist"
 KEY_NOT_EXIST = "not_exist"
 KEY_LENGTH_DEFAULT = "length_default"
@@ -71,7 +70,6 @@ KEY_LENGTH_CODE_PIN = "length_code_pin"
 KEY_INCORRECT_CODE_PIN = "incorrect_code_pin"
 KEY_RESPECT_CREDIT = "incorrect_credit"
 
-# DICTIONNAIRE
 ERROR_MESSAGES = {
     KEY_EXIST : "existe déjà",
     KEY_NOT_EXIST : "n'existe pas",

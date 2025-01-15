@@ -1,4 +1,3 @@
-# Functions - Views
 from shutil import get_terminal_size
 import time
 import sys
@@ -276,6 +275,6 @@ def display_aurevoir():
         console.print(f"[bold magenta]{line}[/bold magenta]", justify='center', style="on black")
         time.sleep(0.2)
 
-    console.print("\n✨[bold cyan]À bientôt ![/bold cyan] 💫", justify="center")
+    console.print("\n💫 [bold cyan]À bientôt ![/bold cyan] 💫", justify="center")
     time.sleep(2)
     effacer_ecran()
