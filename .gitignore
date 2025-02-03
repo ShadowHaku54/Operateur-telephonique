@@ -1,2 +1,4 @@
 *.pyc
 DB/*/
+!DB/Sounds/
+DB/Sounds/Vocaux
