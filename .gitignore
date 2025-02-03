@@ -1,4 +1,8 @@
 *.pyc
-DB/*/
-!DB/Sounds/
-DB/Sounds/Vocaux
+
+DB/Clients/*
+DB/Operateurs/*
+DB/Sounds/Vocaux/*
+!DB/Clients/.gitkeep
+!DB/Operateurs/.gitkeep
+!DB/Sounds/Vocaux/.gitkeep
