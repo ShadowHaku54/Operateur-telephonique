@@ -80,6 +80,8 @@ Ce projet est une application de gestion des opérateurs télécom et de leurs c
    python main.py
    ```
 
+## Licence
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 ## 🚀 Auteur [@ShadowHaku54](https://github.com/ShadowHaku54)
 
