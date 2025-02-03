@@ -1,4 +1,3 @@
-# Client -Controllers
 from Models import Client as ClientModels
 from Views import Functions as FuncViews
 from Views import Client as ClientViews

@@ -1,8 +1,8 @@
 from shutil import get_terminal_size
 import time
 import sys
-import pyfiglet
 
+import pyfiglet
 from rich.console import Console
 from rich.rule import Rule
 from rich.text import Text
@@ -278,3 +278,4 @@ def display_aurevoir():
     console.print("\n💫 [bold cyan]À bientôt ![/bold cyan] 💫", justify="center")
     time.sleep(2)
     effacer_ecran()
+

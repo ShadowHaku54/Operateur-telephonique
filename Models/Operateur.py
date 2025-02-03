@@ -1,4 +1,3 @@
-# Operateur - Models
 import os
 from consts import (
     PATH_DB_OPERATEURS, FILE_INFO, BOOL_DISPO, DIR_INDEX, CHAR_INDEX, PATH_DB_CLIENTS,

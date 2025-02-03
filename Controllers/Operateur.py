@@ -56,7 +56,7 @@ def use_case_gestionnaire():
 
 
 def generate_nums_for_index(index):
-        
+    
     numeros = set()
     
     motifs_possibles = [
